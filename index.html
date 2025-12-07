@@ -367,67 +367,35 @@
         }
 
         async function fetchData() {
-            try {
-                // Use a CORS proxy that actually works
-                const proxy = 'https://api.codetabs.com/v1/proxy?quest=';
-                
-                const athleteRes = await fetch(proxy + encodeURIComponent('https://www.strava.com/api/v3/athlete'), {
-                    headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
-                });
-                const athlete = await athleteRes.json();
-
-                const statsRes = await fetch(proxy + encodeURIComponent(`https://www.strava.com/api/v3/athletes/${athlete.id}/stats`), {
-                    headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
-                });
-                const statsData = await statsRes.json();
-
-                const weekAgo = Math.floor((Date.now() - 7 * 24 * 60 * 60 * 1000) / 1000);
-                const activitiesRes = await fetch(proxy + encodeURIComponent(`https://www.strava.com/api/v3/athlete/activities?after=${weekAgo}`), {
-                    headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
-                });
-                const activities = await activitiesRes.json();
-                const runs = activities.filter(a => a.type === 'Run');
-
-                const weekDistance = (runs.reduce((sum, a) => sum + a.distance, 0) / 1000).toFixed(1);
-                const weekRuns = runs.length;
-                const calories = Math.round(runs.reduce((sum, a) => sum + (a.calories || 0), 0));
-                
-                const avgPaceSeconds = runs.length > 0 
-                    ? runs.reduce((sum, a) => sum + (a.moving_time / (a.distance / 1000)), 0) / runs.length
-                    : 0;
-                const avgPaceMin = Math.floor(avgPaceSeconds / 60);
-                const avgPaceSec = Math.floor(avgPaceSeconds % 60);
-
-                const longestRun = (runs.length > 0 ? Math.max(...runs.map(a => a.distance)) / 1000 : 0).toFixed(1);
-                const monthDistance = ((statsData.recent_run_totals?.distance || 0) / 1000).toFixed(1);
-                const totalRuns = statsData.all_run_totals?.count || 0;
-
-                // Update UI
-                document.getElementById('weekDistance').textContent = weekDistance;
-                document.getElementById('weekRuns').textContent = weekRuns;
-                document.getElementById('avgPace').textContent = `${avgPaceMin}:${avgPaceSec.toString().padStart(2, '0')}`;
-                document.getElementById('longestRun').textContent = longestRun;
-                document.getElementById('monthDistance').textContent = monthDistance;
-                document.getElementById('totalRuns').textContent = totalRuns;
-                document.getElementById('calories').textContent = calories.toLocaleString();
-
-                const progress = (parseFloat(weekDistance) / WEEK_GOAL) * 100;
-                document.getElementById('weekProgress').textContent = Math.round(progress) + '%';
-                document.getElementById('progressBar').style.width = Math.min(progress, 100) + '%';
-                
-                const remaining = WEEK_GOAL - parseFloat(weekDistance);
-                document.getElementById('progressText').textContent = remaining > 0 
-                    ? `${remaining.toFixed(1)} km remaining`
-                    : '🎉 Goal achieved!';
-
-                document.getElementById('status').textContent = '● Connected to Strava';
-                document.getElementById('status').style.color = '#10b981';
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('status').textContent = '○ Connection error';
-                document.getElementById('status').style.color = '#ef4444';
-            }
-        }
+  try {
+    const response = await fetch('/api/strava');
+    const data = await response.json();
+    
+    document.getElementById('weekDistance').textContent = data.weekDistance;
+    document.getElementById('weekRuns').textContent = data.weekRuns;
+    document.getElementById('avgPace').textContent = data.avgPace;
+    document.getElementById('longestRun').textContent = data.longestRun;
+    document.getElementById('monthDistance').textContent = data.monthDistance;
+    document.getElementById('totalRuns').textContent = data.totalRuns;
+    document.getElementById('calories').textContent = parseInt(data.calories).toLocaleString();
+    
+    const progress = (parseFloat(data.weekDistance) / 50) * 100;
+    document.getElementById('weekProgress').textContent = Math.round(progress) + '%';
+    document.getElementById('progressBar').style.width = Math.min(progress, 100) + '%';
+    
+    const remaining = 50 - parseFloat(data.weekDistance);
+    document.getElementById('progressText').textContent = remaining > 0 
+      ? `${remaining.toFixed(1)} km remaining`
+      : '🎉 Goal achieved!';
+    
+    document.getElementById('status').textContent = '● Connected to Strava';
+    document.getElementById('status').style.color = '#10b981';
+  } catch (error) {
+    console.error('Error:', error);
+    document.getElementById('status').textContent = '○ Connection error';
+    document.getElementById('status').style.color = '#ef4444';
+  }
+}
 
         // Initialize
         updateTime();
