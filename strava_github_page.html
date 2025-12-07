@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strava Running Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(to bottom right, #111827, #000000, #111827);
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="text-white p-6">
+    <div id="app"></div>
+
+    <script>
+        // Hardcoded tokens
+        const ACCESS_TOKEN = '56f52015388197a4f265b91f90d5272425722fcb';
+        const REFRESH_TOKEN = '05760c1b8c86e8a81a6666b7a9ac653d82e25bc9';
+        const CLIENT_ID = '188714';
+
+        let stats = {
+            weekDistance: 0,
+            weekRuns: 0,
+            monthDistance: 0,
+            totalRuns: 0,
+            avgPace: '0:00',
+            longestRun: 0,
+            weekGoal: 50,
+            calories: 0
+        };
+
+        async function fetchStravaData() {
+            try {
+                // Fetch athlete info
+                const athleteRes = await fetch('https://www.strava.com/api/v3/athlete', {
+                    headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
+                });
+                const athlete = await athleteRes.json();
+
+                // Fetch stats
+                const statsRes = await fetch(`https://www.strava.com/api/v3/athletes/${athlete.id}/stats`, {
+                    headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
+                });
+                const statsData = await statsRes.json();
+
+                // Fetch recent activities
+                const weekAgo = Math.floor((Date.now() - 7 * 24 * 60 * 60 * 1000) / 1000);
+                const activitiesRes = await fetch(`https://www.strava.com/api/v3/athlete/activities?after=${weekAgo}`, {
+                    headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
+                });
+                const activities = await activitiesRes.json();
+                const runs = activities.filter(a => a.type === 'Run');
+
+                const weekDistance = runs.reduce((sum, a) => sum + a.distance, 0) / 1000;
+                const weekRuns = runs.length;
+                const calories = runs.reduce((sum, a) => sum + (a.calories || 0), 0);
+                
+                const avgPaceSeconds = runs.length > 0 
+                    ? runs.reduce((sum, a) => sum + (a.moving_time / (a.distance / 1000)), 0) / runs.length
+                    : 0;
+                const avgPaceMin = Math.floor(avgPaceSeconds / 60);
+                const avgPaceSec = Math.floor(avgPaceSeconds % 60);
+
+                const longestRun = runs.length > 0 ? Math.max(...runs.map(a => a.distance)) / 1000 : 0;
+
+                stats = {
+                    weekDistance: weekDistance.toFixed(1),
+                    weekRuns: weekRuns,
+                    monthDistance: (statsData.recent_run_totals?.distance / 1000 || 0).toFixed(1),
+                    totalRuns: statsData.all_run_totals?.count || 0,
+                    avgPace: `${avgPaceMin}:${avgPaceSec.toString().padStart(2, '0')}`,
+                    longestRun: longestRun.toFixed(1),
+                    weekGoal: 50,
+                    calories: Math.round(calories)
+                };
+
+                render();
+            } catch (error) {
+                console.error('Error fetching Strava data:', error);
+                document.getElementById('app').innerHTML += `<div class="text-red-400 mt-4">Error: ${error.message}</div>`;
+            }
+        }
+
+        function render() {
+            const now = new Date();
+            const weekProgress = (parseFloat(stats.weekDistance) / stats.weekGoal) * 100;
+
+            document.getElementById('app').innerHTML = `
+                <!-- Header -->
+                <div class="flex justify-between items-center mb-8">
+                    <div class="flex items-center gap-4">
+                        <div class="bg-yellow-400/10 p-3 rounded-xl border border-yellow-400/30">
+                            <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-4xl font-bold bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-400 bg-clip-text text-transparent">
+                                Running Dashboard
+                            </h1>
+                            <p class="text-gray-500 text-sm mt-1">
+                                <span class="text-green-400">● Connected to Strava</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-5xl font-bold text-yellow-400 tracking-tight">
+                            ${now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                        <div class="text-gray-500 text-sm mt-1">
+                            ${now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Grid -->
+                <div class="grid grid-cols-4 gap-5 mb-5">
+                    <!-- This Week -->
+                    <div class="col-span-2 bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-yellow-400/20">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="bg-yellow-400/10 p-2 rounded-lg">
+                                <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                            <h2 class="text-2xl font-bold text-yellow-400">This Week</h2>
+                        </div>
+                        <div class="grid grid-cols-2 gap-8">
+                            <div>
+                                <div class="text-6xl font-bold mb-2 bg-gradient-to-br from-yellow-400 to-yellow-300 bg-clip-text text-transparent">
+                                    ${stats.weekDistance}
+                                </div>
+                                <div class="text-gray-500 text-sm uppercase tracking-wider font-semibold">Kilometers</div>
+                            </div>
+                            <div>
+                                <div class="text-6xl font-bold mb-2 bg-gradient-to-br from-yellow-400 to-yellow-300 bg-clip-text text-transparent">
+                                    ${stats.weekRuns}
+                                </div>
+                                <div class="text-gray-500 text-sm uppercase tracking-wider font-semibold">Runs</div>
+                            </div>
+                        </div>
+                        <div class="mt-8">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-sm font-semibold text-gray-400">Weekly Goal</span>
+                                <span class="text-sm font-bold text-yellow-400">${Math.round(weekProgress)}%</span>
+                            </div>
+                            <div class="h-4 bg-gray-800/80 rounded-full overflow-hidden shadow-inner">
+                                <div class="h-full bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-400 rounded-full transition-all duration-500" style="width: ${Math.min(weekProgress, 100)}%"></div>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-2">
+                                ${stats.weekGoal - parseFloat(stats.weekDistance) > 0 
+                                    ? `${(stats.weekGoal - parseFloat(stats.weekDistance)).toFixed(1)} km remaining` 
+                                    : '🎉 Goal achieved!'}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Avg Pace -->
+                    <div class="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-yellow-400/20">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="bg-yellow-400/10 p-2 rounded-lg">
+                                <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-yellow-400">Avg Pace</h3>
+                        </div>
+                        <div class="text-5xl font-bold mb-2">${stats.avgPace}</div>
+                        <div class="text-gray-500 text-sm">per kilometer</div>
+                    </div>
+
+                    <!-- Longest Run -->
+                    <div class="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-yellow-400/20">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="bg-yellow-400/10 p-2 rounded-lg">
+                                <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-yellow-400">Longest Run</h3>
+                        </div>
+                        <div class="text-5xl font-bold mb-2">${stats.longestRun}</div>
+                        <div class="text-gray-500 text-sm">kilometers</div>
+                    </div>
+
+                    <!-- This Month -->
+                    <div class="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-yellow-400/20">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="bg-yellow-400/10 p-2 rounded-lg">
+                                <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-yellow-400">This Month</h3>
+                        </div>
+                        <div class="text-5xl font-bold mb-2">${stats.monthDistance}</div>
+                        <div class="text-gray-500 text-sm">kilometers</div>
+                    </div>
+
+                    <!-- Total Runs -->
+                    <div class="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-yellow-400/20">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="bg-yellow-400/10 p-2 rounded-lg">
+                                <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-yellow-400">Total Runs</h3>
+                        </div>
+                        <div class="text-5xl font-bold mb-2">${stats.totalRuns}</div>
+                        <div class="text-gray-500 text-sm">all time</div>
+                    </div>
+
+                    <!-- Calories -->
+                    <div class="col-span-2 bg-gradient-to-br from-yellow-400/10 to-yellow-500/5 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-yellow-400/30">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="bg-yellow-400/20 p-2 rounded-lg">
+                                <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-semibold text-yellow-400">Calories Burned</h3>
+                        </div>
+                        <div class="flex items-baseline gap-3">
+                            <div class="text-6xl font-bold bg-gradient-to-br from-yellow-400 to-yellow-300 bg-clip-text text-transparent">
+                                ${stats.calories.toLocaleString()}
+                            </div>
+                            <div class="text-gray-500 text-sm mb-3">this week</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Predictions -->
+                <div class="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-yellow-400/20">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="bg-yellow-400/10 p-2 rounded-lg">
+                            <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-yellow-400">Performance Predictions</h2>
+                        <span class="text-xs text-gray-600 ml-2">(Requires Strava Premium)</span>
+                    </div>
+                    <div class="grid grid-cols-4 gap-5">
+                        <div class="bg-gray-800/50 rounded-2xl p-6 border border-yellow-400/10">
+                            <div class="text-yellow-400 text-sm font-bold mb-3 uppercase tracking-wider">5K</div>
+                            <div class="text-5xl font-bold text-white mb-2">24:15</div>
+                            <div class="text-gray-500 text-xs uppercase tracking-wide">Predicted Time</div>
+                        </div>
+                        <div class="bg-gray-800/50 rounded-2xl p-6 border border-yellow-400/10">
+                            <div class="text-yellow-400 text-sm font-bold mb-3 uppercase tracking-wider">10K</div>
+                            <div class="text-5xl font-bold text-white mb-2">50:32</div>
+                            <div class="text-gray-500 text-xs uppercase tracking-wide">Predicted Time</div>
+                        </div>
+                        <div class="bg-gray-800/50 rounded-2xl p-6 border border-yellow-400/10">
+                            <div class="text-yellow-400 text-sm font-bold mb-3 uppercase tracking-wider">Half Marathon</div>
+                            <div class="text-5xl font-bold text-white mb-2">1:52:45</div>
+                            <div class="text-gray-500 text-xs uppercase tracking-wide">Predicted Time</div>
+                        </div>
+                        <div class="bg-gray-800/50 rounded-2xl p-6 border border-yellow-400/10">
+                            <div class="text-yellow-400 text-sm font-bold mb-3 uppercase tracking-wider">Marathon</div>
+                            <div class="text-5xl font-bold text-white mb-2">3:58:20</div>
+                            <div class="text-gray-500 text-xs uppercase tracking-wide">Predicted Time</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initial fetch and render
+        fetchStravaData();
+        
+        // Update time every second
+        setInterval(() => {
+            render();
+        }, 1000);
+
+        // Refresh data every 5 minutes
+        setInterval(() => {
+            fetchStravaData();
+        }, 5 * 60 * 1000);
+    </script>
+</body>
+</html>
