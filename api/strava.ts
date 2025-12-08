@@ -3,11 +3,33 @@ export const config = {
 };
 
 export default async function handler(req: Request) {
-  const ACCESS_TOKEN = '56f52015388197a4f265b91f90d5272425722fcb';
+  const CLIENT_ID = process.env.STRAVA_CLIENT_ID!;
+  const CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET!;
+  const REFRESH_TOKEN = process.env.STRAVA_REFRESH_TOKEN!;
   
   try {
+    // Get a fresh access token using refresh token
+    const tokenRes = await fetch('https://www.strava.com/oauth/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET,
+        grant_type: 'refresh_token',
+        refresh_token: REFRESH_TOKEN,
+      })
+    });
+
+    if (!tokenRes.ok) {
+      throw new Error(`Token refresh failed: ${tokenRes.status}`);
+    }
+
+    const tokenData = await tokenRes.json();
+    const accessToken = tokenData.access_token;
+
+    // Now use the fresh access token
     const athleteRes = await fetch('https://www.strava.com/api/v3/athlete', {
-      headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
+      headers: { 'Authorization': `Bearer ${accessToken}` }
     });
     
     if (!athleteRes.ok) {
@@ -17,7 +39,7 @@ export default async function handler(req: Request) {
     const athlete = await athleteRes.json();
     
     const statsRes = await fetch(`https://www.strava.com/api/v3/athletes/${athlete.id}/stats`, {
-      headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
+      headers: { 'Authorization': `Bearer ${accessToken}` }
     });
     
     if (!statsRes.ok) {
@@ -28,7 +50,7 @@ export default async function handler(req: Request) {
     
     const weekAgo = Math.floor((Date.now() - 7 * 24 * 60 * 60 * 1000) / 1000);
     const activitiesRes = await fetch(`https://www.strava.com/api/v3/athlete/activities?after=${weekAgo}`, {
-      headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
+      headers: { 'Authorization': `Bearer ${accessToken}` }
     });
     
     if (!activitiesRes.ok) {
