@@ -3,9 +3,10 @@ export const config = {
 };
 
 export default async function handler(req: Request) {
-  const CLIENT_ID = process.env.STRAVA_CLIENT_ID!;
-  const CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET!;
-  const REFRESH_TOKEN = process.env.STRAVA_REFRESH_TOKEN!;
+  // Edge runtime uses Deno-style env access
+  const CLIENT_ID = Deno.env.get('STRAVA_CLIENT_ID') || '188714';
+  const CLIENT_SECRET = Deno.env.get('STRAVA_CLIENT_SECRET') || '';
+  const REFRESH_TOKEN = Deno.env.get('STRAVA_REFRESH_TOKEN') || '';
   
   try {
     // Get a fresh access token using refresh token
@@ -21,7 +22,8 @@ export default async function handler(req: Request) {
     });
 
     if (!tokenRes.ok) {
-      throw new Error(`Token refresh failed: ${tokenRes.status}`);
+      const err = await tokenRes.text();
+      throw new Error(`Token refresh failed: ${tokenRes.status} - ${err}`);
     }
 
     const tokenData = await tokenRes.json();
