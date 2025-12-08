@@ -1,0 +1,7 @@
+{
+  "name": "stravarun",
+  "type": "module",
+  "devDependencies": {
+    "@vercel/edge": "^0.6.1"
+  }
+}
