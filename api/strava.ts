@@ -1,14 +1,16 @@
 /// <reference types="@vercel/edge" />
+// @ts-ignore
+const DenoEnv = Deno.env;
 
 export const config = {
   runtime: 'edge',
 };
 
 export default async function handler(req: Request) {
-  // Read environment variables at runtime (Edge uses Deno)
-  const CLIENT_ID = Deno.env.get('STRAVA_CLIENT_ID')!;
-  const CLIENT_SECRET = Deno.env.get('STRAVA_CLIENT_SECRET')!;
-  const REFRESH_TOKEN = Deno.env.get('STRAVA_REFRESH_TOKEN')!;
+  // Use Vercel Edge environment variables
+  const CLIENT_ID = DenoEnv.get('STRAVA_CLIENT_ID')!;
+  const CLIENT_SECRET = DenoEnv.get('STRAVA_CLIENT_SECRET')!;
+  const REFRESH_TOKEN = DenoEnv.get('STRAVA_REFRESH_TOKEN')!;
 
   try {
     // 1) Refresh the access token
