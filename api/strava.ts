@@ -36,8 +36,6 @@ export default async function handler(req: Request) {
     }
     
     const activities = await activitiesRes.json();
-    
-    // Make sure activities is an array
     const activitiesArray = Array.isArray(activities) ? activities : [];
     const runs = activitiesArray.filter((a: any) => a.type === 'Run');
     
@@ -70,4 +68,11 @@ export default async function handler(req: Request) {
       }
     });
   } catch (error: any) {
-    return new Response
+    return new Response(JSON.stringify({ 
+      error: error.message
+    }), {
+      status: 500,
+      headers: { 'content-type': 'application/json' }
+    });
+  }
+}
