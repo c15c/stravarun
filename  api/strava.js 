@@ -1,8 +1,16 @@
 export default async function handler(req, res) {
-  const ACCESS_TOKEN = '56f52015388197a4f265b91f90d5272425722fcb';
-  
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+  
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
+  const ACCESS_TOKEN = '56f52015388197a4f265b91f90d5272425722fcb';
   
   try {
     const athleteRes = await fetch('https://www.strava.com/api/v3/athlete', {
@@ -34,7 +42,7 @@ export default async function handler(req, res) {
     
     const longestRun = (runs.length > 0 ? Math.max(...runs.map(a => a.distance)) / 1000 : 0).toFixed(1);
     
-    res.json({
+    return res.status(200).json({
       weekDistance,
       weekRuns,
       monthDistance: ((statsData.recent_run_totals?.distance || 0) / 1000).toFixed(1),
@@ -44,6 +52,7 @@ export default async function handler(req, res) {
       calories
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Strava API Error:', error);
+    return res.status(500).json({ error: error.message });
   }
 }
