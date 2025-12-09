@@ -42,7 +42,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const accessToken = await getValidAccessToken();
     
     const response = await fetch(
-      'https://www.strava.com/api/v3/athlete/activities?per_page=30',
+      'https://www.strava.com/api/v3/athlete',
       {
         headers: { 'Authorization': `Bearer ${accessToken}` }
       }
