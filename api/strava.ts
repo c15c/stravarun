@@ -1,34 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-async function getValidAccessToken(): Promise<string> {
-  const clientId = process.env.STRAVA_CLIENT_ID;
-  const clientSecret = process.env.STRAVA_CLIENT_SECRET;
-  const refreshToken = process.env.STRAVA_REFRESH_TOKEN;
-
-  if (!clientId || !clientSecret || !refreshToken) {
-    throw new Error('Missing Strava credentials in environment variables');
-  }
-
-  // Refresh the token
-  const response = await fetch('https://www.strava.com/oauth/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      client_id: clientId,
-      client_secret: clientSecret,
-      grant_type: 'refresh_token',
-      refresh_token: refreshToken
-    })
-  });
-
-  if (!response.ok) {
-    throw new Error(`Token refresh failed: ${response.status}`);
-  }
-
-  const data = await response.json();
-  return data.access_token;
-}
-
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -39,27 +10,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const accessToken = await getValidAccessToken();
-    
-    const response = await fetch('https://www.strava.com/api/v3/athlete/stats', {
-  headers: {
-    'Authorization': `Bearer ${accessToken}`,
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
-  }
-});
-
-    
-    if (!response.ok) {
-      throw new Error(`Strava API returned ${response.status}`);
+    const accessToken = process.env.STRAVA_ACCESS_TOKEN;
+    if (!accessToken) {
+      console.error('No STRAVA_ACCESS_TOKEN env var');
+      return res.status(500).json({ error: 'STRAVA_ACCESS_TOKEN missing' });
     }
-    
-    const data = await response.json();
-    return res.status(200).json(data);
-  } catch (err) {
-    console.error('Strava API Error:', err);
-    return res.status(500).json({ 
-      status: 'error', 
-      message: err instanceof Error ? err.message : 'Failed to fetch Strava data'
+
+    const apiResponse = await fetch('https://www.strava.com/api/v3/athlete/stats', {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
+      }
     });
+
+    const text = await apiResponse.text();
+    console.log('Strava status:', apiResponse.status, 'preview:', text.substring(0, 200));
+
+    if (!apiResponse.ok) {
+      console.error('Strava error body:', text);
+      return res.status(apiResponse.status).json({ error: `Strava ${apiResponse.status}`, body: text.substring(0, 300) });
+    }
+
+    const data = JSON.parse(text);
+    return res.status(200).json(data);
+  } catch (err: any) {
+    console.error('Full Vercel error:', err);
+    return res.status(500).json({ error: err.message });
   }
 }
