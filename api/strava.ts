@@ -41,12 +41,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const accessToken = await getValidAccessToken();
     
-    const response = await fetch(
-      'https://www.strava.com/api/v3/athlete',
-      {
-        headers: { 'Authorization': `Bearer ${accessToken}` }
+    const response = await fetch('https://www.strava.com/api/v3/athlete/activities?per_page=30', {
+      headers: { 
+        'Authorization': `Bearer ${accessToken}`,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
       }
-    );
+    });
     
     if (!response.ok) {
       throw new Error(`Strava API returned ${response.status}`);
