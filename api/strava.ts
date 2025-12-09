@@ -1,7 +1,35 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
+async function getValidAccessToken(): Promise<string> {
+  const clientId = process.env.STRAVA_CLIENT_ID;
+  const clientSecret = process.env.STRAVA_CLIENT_SECRET;
+  const refreshToken = process.env.STRAVA_REFRESH_TOKEN;
+
+  if (!clientId || !clientSecret || !refreshToken) {
+    throw new Error('Missing Strava credentials in environment variables');
+  }
+
+  // Refresh the token
+  const response = await fetch('https://www.strava.com/oauth/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id: clientId,
+      client_secret: clientSecret,
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`Token refresh failed: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.access_token;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Handle CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -11,19 +39,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const accessToken = process.env.STRAVA_ACCESS_TOKEN;
+    const accessToken = await getValidAccessToken();
     
-    if (!accessToken) {
-      throw new Error('STRAVA_ACCESS_TOKEN not configured');
-    }
-
-    // Get athlete stats from Strava API
     const response = await fetch(
       'https://www.strava.com/api/v3/athlete/activities?per_page=30',
       {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
-        }
+        headers: { 'Authorization': `Bearer ${accessToken}` }
       }
     );
     
