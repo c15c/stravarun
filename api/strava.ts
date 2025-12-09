@@ -8,7 +8,7 @@ export default async function handler() {
   const REFRESH_TOKEN = Deno.env.get("STRAVA_REFRESH_TOKEN")!;
 
   try {
-    // Refresh access token
+    // 1. Refresh token
     const tokenRes = await fetch("https://www.strava.com/oauth/token", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -24,15 +24,23 @@ export default async function handler() {
     const tokenData = await tokenRes.json();
     const accessToken = tokenData.access_token;
 
-    // Get athlete profile
+    // 2. Athlete
     const athleteRes = await fetch("https://www.strava.com/api/v3/athlete", {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
     if (!athleteRes.ok) throw new Error("Athlete fetch failed");
     const athlete = await athleteRes.json();
 
-    // Fetch last 7 days activities
-    const weekAgo = Math.floor(Date.now() / 1000 - 7 * 24 * 60 * 60);
+    // 3. Stats (month + total)
+    const statsRes = await fetch(
+      `https://www.strava.com/api/v3/athletes/${athlete.id}/stats`,
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+    if (!statsRes.ok) throw new Error("Stats fetch failed");
+    const stats = await statsRes.json();
+
+    // 4. Activities (week)
+    const weekAgo = Math.floor(Date.now() / 1000) - 7 * 24 * 60 * 60;
     const activitiesRes = await fetch(
       `https://www.strava.com/api/v3/athlete/activities?after=${weekAgo}`,
       { headers: { Authorization: `Bearer ${accessToken}` } }
@@ -40,20 +48,60 @@ export default async function handler() {
     if (!activitiesRes.ok) throw new Error("Activities fetch failed");
     const activities = await activitiesRes.json();
 
-    const runs = Array.isArray(activities)
-      ? activities.filter((a: any) => a.type === "Run")
-      : [];
+    const runs = activities.filter((a: any) => a.type === "Run");
 
-    const weekDistance = (runs.reduce((sum, a) => sum + (a.distance || 0), 0) / 1000).toFixed(1);
-    const weekRuns = runs.length;
+    // Weekly distance km
+    const weekDistance = (runs.reduce((s, r) => s + (r.distance || 0), 0) / 1000).toFixed(1);
+
+    // Calories burned
+    const calories = Math.round(
+      runs.reduce((s, r) => s + (r.calories || 0), 0)
+    );
+
+    // Avg pace (min/km)
+    let avgPace = "0:00";
+    if (runs.length > 0) {
+      const secPerKmTotal = runs.reduce(
+        (sum, r) => sum + r.moving_time / ((r.distance || 1) / 1000),
+        0
+      );
+      const secPerKmAvg = secPerKmTotal / runs.length;
+      const min = Math.floor(secPerKmAvg / 60);
+      const sec = Math.floor(secPerKmAvg % 60)
+        .toString()
+        .padStart(2, "0");
+      avgPace = `${min}:${sec}`;
+    }
+
+    // Longest run km
+    const longestRun = runs.length
+      ? (Math.max(...runs.map((r: any) => r.distance || 0)) / 1000).toFixed(1)
+      : "0";
+
+    // Month distance
+    const monthDistance = ((stats.recent_run_totals?.distance || 0) / 1000).toFixed(1);
 
     return new Response(
-      JSON.stringify({ weekDistance, weekRuns }),
+      JSON.stringify({
+        weekDistance,
+        weekRuns: runs.length,
+        calories,
+        avgPace,
+        longestRun,
+        monthDistance,
+        totalRuns: stats.all_run_totals?.count || 0,
+      }),
       {
-        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
       }
     );
-  } catch (err: any) {
-    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+  } catch (error: any) {
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { status: 500 }
+    );
   }
 }
