@@ -40,7 +40,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let startDate: Date;
     let endDate: Date;
 
-      if (start && end) {
+    if (start && end) {
+      // Use explicit range from query
       startDate = new Date(start);
       endDate = new Date(end);
     } else {
@@ -48,8 +49,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const nowLocal = new Date();
       endDate = nowLocal;
 
-      const day = nowLocal.getDay(); // 0 = Sunday, 1 = Monday, ...
-      const diffToMonday = (day + 6) % 7; // days since Monday
+      const day = nowLocal.getDay(); // 0 = Sunday, 1 = Monday, ... 6 = Saturday
+      const diffToMonday = (day + 6) % 7; // 0 if Monday, 1 if Tuesday, ... 6 if Sunday
+
       startDate = new Date(
         nowLocal.getFullYear(),
         nowLocal.getMonth(),
@@ -60,7 +62,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         0
       );
     }
-
 
     const startIso = startDate.toISOString();
     const endIso = endDate.toISOString();
@@ -82,10 +83,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const activities = await apiRes.json();
 
     // Runs in the selected range (inclusive)
-    const runsInRange = activities.filter((act: any) =>
-      act.sport_type === 'Run' &&
-      act.start_date >= startIso &&
-      act.start_date <= endIso
+    const runsInRange = activities.filter(
+      (act: any) =>
+        act.sport_type === 'Run' &&
+        act.start_date >= startIso &&
+        act.start_date <= endIso
     );
 
     const totalKm = runsInRange.reduce(
@@ -122,9 +124,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const longestRunKm =
       totalRuns > 0
-        ? Math.max(
-            ...runsInRange.map((act: any) => act.distance / 1000)
-          )
+        ? Math.max(...runsInRange.map((act: any) => act.distance / 1000))
         : 0;
 
     // Also compute simple all‑time totals for context
