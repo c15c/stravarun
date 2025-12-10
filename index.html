@@ -156,16 +156,30 @@
       flex: 1 1 auto;
     }
     .quote-image {
-    flex: 0 0 auto;
-    max-height: 72px;
-    max-width: 72px;
-    height: auto;
-    width: auto;
-    object-fit: contain;
-    border-radius: 50%;
-    transform-origin: 50% 90%;    /* pivot near the chin */
-    animation: headshake 1.6s ease-in-out infinite;
-  }
+      flex: 0 0 auto;
+      max-height: 72px;
+      max-width: 72px;
+      height: auto;
+      width: auto;
+      object-fit: contain;
+      border-radius: 50%;
+      transform-origin: 50% 90%;    /* pivot near the chin */
+      animation: headshake 1.6s ease-in-out infinite;
+    }
+
+    .card-quote .card-main {
+      font-size: 24px;
+      line-height: 1.3;
+    }
+
+    @keyframes headshake {
+      0%   { transform: rotate(0deg); }
+      20%  { transform: rotate(-6deg); }
+      40%  { transform: rotate(6deg); }
+      60%  { transform: rotate(-4deg); }
+      80%  { transform: rotate(4deg); }
+      100% { transform: rotate(0deg); }
+    }
 
     @media (max-width: 900px) {
       .grid {
@@ -189,20 +203,6 @@
         text-align: left;
       }
     }
-  .card-quote .card-main {
-  font-size: 24px;   /* try 22–24px; adjust to taste */
-  line-height: 1.3;
-}
-@keyframes headshake {
-  0%   { transform: rotate(0deg); }
-  20%  { transform: rotate(-6deg); }
-  40%  { transform: rotate(6deg); }
-  60%  { transform: rotate(-4deg); }
-  80%  { transform: rotate(4deg); }
-  100% { transform: rotate(0deg); }
-}
-
-    
   </style>
 </head>
 <body>
@@ -279,14 +279,13 @@
         <div class="card-title">Calories Burned</div>
         <div class="card-main">
           <span id="calories">0</span>
-          <span class="small"></span>
         </div>
         <div class="card-sub">
           Estimated calories from runs
         </div>
       </div>
 
-      <!-- This Month (approx last 30 days) -->
+      <!-- This Month (month-to-date from API) -->
       <div class="card card-highlight">
         <div class="card-title">This Month</div>
         <div class="card-main">
@@ -294,7 +293,7 @@
           <span class="small">kilometers</span>
         </div>
         <div class="card-sub">
-          Total run distance (30 days)
+          Total run distance this month
         </div>
       </div>
 
@@ -454,12 +453,11 @@
 
         const monthKmEl = document.getElementById('month-km');
         if (monthKmEl) {
-          const now = Date.now();
-          const thirtyAgo = now - 30 * 24 * 60 * 60 * 1000;
-          const monthKm = activities
-            .filter((a) => new Date(a.start_date).getTime() >= thirtyAgo)
-            .reduce((sum, a) => sum + a.distance / 1000, 0);
-          monthKmEl.textContent = monthKm.toFixed(1);
+          if (s.monthKm != null) {
+            monthKmEl.textContent = s.monthKm.toFixed(1);
+          } else {
+            monthKmEl.textContent = '0.0';
+          }
         }
       } catch (err) {
         console.error(err);
@@ -485,34 +483,16 @@
         });
       }
 
+      const bennettHead = document.querySelector('.quote-image');
+      if (bennettHead) {
+        bennettHead.addEventListener('click', () => {
+          setRandomQuote();
+          fetchData();
+        });
+      }
+
       fetchData();
     });
-
-    document.addEventListener('DOMContentLoaded', () => {
-  setDefaultRange();
-  setRandomQuote();
-  updateClock();
-  setInterval(updateClock, 30 * 1000);
-
-  const apply = document.getElementById('apply-range');
-  if (apply) {
-    apply.addEventListener('click', () => {
-      setRandomQuote();
-      fetchData();
-    });
-  }
-
-  // NEW: tap Bennett's head to refresh data + quote
-  const bennettHead = document.querySelector('.quote-image');
-  if (bennettHead) {
-    bennettHead.addEventListener('click', () => {
-      setRandomQuote();
-      fetchData();
-    });
-  }
-
-  fetchData();
-});
   </script>
 </body>
 </html>
