@@ -1,59 +1,38 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-async function refreshStravaToken(): Promise<string> {
-  const clientId = process.env.STRAVA_CLIENT_ID!;
-  const clientSecret = process.env.STRAVA_CLIENT_SECRET!;
-  const refreshToken = process.env.STRAVA_REFRESH_TOKEN!;
-
-  const tokenResponse = await fetch('https://www.strava.com/api/v3/oauth/token', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
-    },
-    body: new URLSearchParams({
-      client_id: clientId,
-      client_secret: clientSecret,
-      grant_type: 'refresh_token',
-      refresh_token: refreshToken
-    })
+async function refreshToken(): Promise<string> {
+  const params = new URLSearchParams({
+    client_id: process.env.STRAVA_CLIENT_ID!,
+    client_secret: process.env.STRAVA_CLIENT_SECRET!,
+    grant_type: 'refresh_token',
+    refresh_token: process.env.STRAVA_REFRESH_TOKEN!
   });
-
-  if (!tokenResponse.ok) {
-    throw new Error(`Refresh failed ${tokenResponse.status}`);
-  }
-
-  const tokenData = await tokenResponse.json();
-  return tokenData.access_token as string;
+  
+  const res = await fetch('https://www.strava.com/api/v3/oauth/token', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': 'Mozilla/5.0'},
+    body: params
+  });
+  
+  if (!res.ok) throw new Error(`Refresh ${res.status}`);
+  return (await res.json()).access_token;
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
-    let accessToken = process.env.STRAVA_ACCESS_TOKEN;
-    if (!accessToken) {
-      accessToken = await refreshStravaToken();
-    }
-
-    const apiResponse = await fetch('https://www.strava.com/api/v3/athlete/stats', {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
-      }
+    const token = await refreshToken();
+    const apiRes = await fetch('https://www.strava.com/api/v3/athlete/activities?per_page=30', {
+      headers: {'Authorization': `Bearer ${token}`, 'User-Agent': 'Mozilla/5.0'}
     });
-
-    const text = await apiResponse.text();
-    if (!apiResponse.ok) throw new Error(`API ${apiResponse.status}: ${text.substring(0, 200)}`);
-
-    const data = JSON.parse(text);
-    res.status(200).json(data);
-  } catch (err: any) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
+    
+    const data = await apiRes.json();
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({error: e.message});
   }
 }
