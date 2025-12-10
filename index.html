@@ -156,14 +156,16 @@
       flex: 1 1 auto;
     }
     .quote-image {
-      flex: 0 0 auto;
-      max-height: 72px;
-      max-width: 72px;
-      height: auto;
-      width: auto;
-      object-fit: contain;
-      border-radius: 50%;
-    }
+    flex: 0 0 auto;
+    max-height: 72px;
+    max-width: 72px;
+    height: auto;
+    width: auto;
+    object-fit: contain;
+    border-radius: 50%;
+    transform-origin: 50% 90%;    /* pivot near the chin */
+    animation: headshake 1.6s ease-in-out infinite;
+  }
 
     @media (max-width: 900px) {
       .grid {
@@ -191,6 +193,17 @@
   font-size: 24px;   /* try 22–24px; adjust to taste */
   line-height: 1.3;
 }
+@keyframes headshake {
+  0%   { transform: rotate(0deg); }
+  20%  { transform: rotate(-6deg); }
+  40%  { transform: rotate(6deg); }
+  60%  { transform: rotate(-4deg); }
+  80%  { transform: rotate(4deg); }
+  100% { transform: rotate(0deg); }
+}
+
+
+    
   </style>
 </head>
 <body>
