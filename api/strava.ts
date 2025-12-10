@@ -90,6 +90,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         act.start_date <= endIso
     );
 
+    // All-time runs (from this activities window Strava returns)
+    const allRuns = activities.filter((act: any) => act.sport_type === 'Run');
+
+    // Month-to-date: from first day of this month (local) to endDate
+    const nowLocal = new Date();
+    const monthStart = new Date(
+      nowLocal.getFullYear(),
+      nowLocal.getMonth(),
+      1,
+      0,
+      0,
+      0,
+      0
+    );
+    const monthStartIso = monthStart.toISOString();
+
+    const monthRuns = activities.filter(
+      (act: any) =>
+        act.sport_type === 'Run' &&
+        act.start_date >= monthStartIso &&
+        act.start_date <= endIso
+    );
+
+    const monthKm = monthRuns.reduce(
+      (sum: number, act: any) => sum + act.distance / 1000,
+      0
+    );
+
     const totalKm = runsInRange.reduce(
       (sum: number, act: any) => sum + act.distance / 1000,
       0
@@ -113,9 +141,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       avgPacePerKm = `${minutes}:${seconds.toString().padStart(2, '0')}`;
     }
 
-  // Approximate calories based on your Strava data: ~80 kcal per km
+    // Approximate calories based on your data (~80 kcal per km)
     const caloriesPerKm = 80;
-
     const calories = Math.round(
       runsInRange.reduce((sum: number, act: any) => {
         const km = act.distance / 1000;
@@ -123,14 +150,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }, 0)
     );
 
-
     const longestRunKm =
       totalRuns > 0
         ? Math.max(...runsInRange.map((act: any) => act.distance / 1000))
         : 0;
 
-    // Also compute simple all‑time totals for context
-    const allRuns = activities.filter((act: any) => act.sport_type === 'Run');
     const allKm = allRuns.reduce(
       (sum: number, act: any) => sum + act.distance / 1000,
       0
@@ -147,6 +171,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         avgPacePerKm,
         calories,
         longestRunKm: Number(longestRunKm.toFixed(1)),
+        monthKm: Number(monthKm.toFixed(1)),
         allTimeKm: Number(allKm.toFixed(1)),
         allTimeRuns: allRuns.length
       },
