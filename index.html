@@ -345,16 +345,26 @@
     }
 
     function setDefaultRange() {
-      const startInput = document.getElementById('start-date');
-      const endInput = document.getElementById('end-date');
-      if (!startInput || !endInput) return;
+  const startInput = document.getElementById('start-date');
+  const endInput = document.getElementById('end-date');
+  if (!startInput || !endInput) return;
 
-      const today = new Date();
-      const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const today = new Date();
 
-      endInput.value = today.toISOString().slice(0, 10);
-      startInput.value = sevenDaysAgo.toISOString().slice(0, 10);
-    }
+  const day = today.getDay(); // 0=Sun,1=Mon,...6=Sat
+  const diffToMonday = (day + 6) % 7;
+
+  const monday = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate() - diffToMonday,
+    0, 0, 0, 0
+  );
+
+  endInput.value = today.toISOString().slice(0, 10);      // today
+  startInput.value = monday.toISOString().slice(0, 10);   // this Monday
+}
+
 
     function updateRangeLabel(range) {
       const label = document.getElementById('range-label');
