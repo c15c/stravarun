@@ -413,30 +413,32 @@
     });
   </script>
   <script>
-  async function fetchRunningQuote() {
-    try {
-      // Example with Quotable random quote endpoint
-      const res = await fetch("https://api.quotable.io/random");
-      const data = await res.json();
+  const runningQuotes = [
+    "Every finish line is a starting line in disguise",
+    "We do hard things not so they become easy, but so we can take on even harder things",
+    "You can get better at running, while not running",
+    "If you aren't running, you are recovering",
+    "Celebrate!",
+    "This is about running, and it's also not about running",
+    "Easy runs should feel easy",
+    "Run smart",
+    "There are no guarantees when you cross the starting line",
+    "You are a bad-ass!",
+    "Running isn't boring, but some runners are.",
+    "Play at running.",
+    "Release the Kraken!",
+    "We don't race to prove we're runners, we race to celebrate being runners.",
+    "Count your victories in as many ways as you can",
+    "Every run has a purpose."
+  ];
 
-      // Simple keyword filter; if it doesn't look running-related,
-      // just show whatever came back or you can retry.
-      const text = data.content || "";
-      const looksRunning =
-        /run|runner|running|mile|marathon|race/i.test(text);
-
-      document.getElementById("running-quote-text").textContent =
-        looksRunning ? text : "One run at a time.";
-      document.getElementById("running-quote-author").textContent =
-        data.author ? "— " + data.author : "";
-    } catch (e) {
-      document.getElementById("running-quote-text").textContent =
-        "Lace up, show up, never give up.";
-      document.getElementById("running-quote-author").textContent = "";
-    }
+  function setRandomRunningQuote() {
+    const quote = runningQuotes[Math.floor(Math.random() * runningQuotes.length)];
+    document.getElementById("running-quote-text").textContent = quote;
+    document.getElementById("running-quote-author").textContent = ""; // No authors needed
   }
 
-  document.addEventListener("DOMContentLoaded", fetchRunningQuote);
+  document.addEventListener("DOMContentLoaded", setRandomRunningQuote);
 </script>
 </body>
 </html>
