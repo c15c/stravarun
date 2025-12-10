@@ -202,32 +202,6 @@
   100% { transform: rotate(0deg); }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  setDefaultRange();
-  setRandomQuote();
-  updateClock();
-  setInterval(updateClock, 30 * 1000);
-
-  const apply = document.getElementById('apply-range');
-  if (apply) {
-    apply.addEventListener('click', () => {
-      setRandomQuote();
-      fetchData();
-    });
-  }
-
-  // NEW: tap Bennett's head to refresh data + quote
-  const bennettHead = document.querySelector('.quote-image');
-  if (bennettHead) {
-    bennettHead.addEventListener('click', () => {
-      setRandomQuote();
-      fetchData();
-    });
-  }
-
-  fetchData();
-});
-
     
   </style>
 </head>
@@ -513,6 +487,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
       fetchData();
     });
+
+    document.addEventListener('DOMContentLoaded', () => {
+  setDefaultRange();
+  setRandomQuote();
+  updateClock();
+  setInterval(updateClock, 30 * 1000);
+
+  const apply = document.getElementById('apply-range');
+  if (apply) {
+    apply.addEventListener('click', () => {
+      setRandomQuote();
+      fetchData();
+    });
+  }
+
+  // NEW: tap Bennett's head to refresh data + quote
+  const bennettHead = document.querySelector('.quote-image');
+  if (bennettHead) {
+    bennettHead.addEventListener('click', () => {
+      setRandomQuote();
+      fetchData();
+    });
+  }
+
+  fetchData();
+});
   </script>
 </body>
 </html>
