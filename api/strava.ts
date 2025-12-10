@@ -113,14 +113,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       avgPacePerKm = `${minutes}:${seconds.toString().padStart(2, '0')}`;
     }
 
+  // Approximate calories based on your Strava data: ~80 kcal per km
+    const caloriesPerKm = 80;
+
     const calories = Math.round(
       runsInRange.reduce((sum: number, act: any) => {
-        if (typeof act.kilojoules === 'number') {
-          return sum + act.kilojoules * 0.239; // kJ → kcal approx
-        }
-        return sum + (act.distance / 1000) * 90; // rough fallback
+        const km = act.distance / 1000;
+        return sum + km * caloriesPerKm;
       }, 0)
     );
+
 
     const longestRunKm =
       totalRuns > 0
