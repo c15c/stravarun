@@ -34,7 +34,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const token = await refreshToken();
 
-    // Read optional start/end (YYYY-MM-DD) from query, default to last 7 days
+    // Optional ?start=YYYY-MM-DD&end=YYYY-MM-DD
     const { start, end } = req.query as { start?: string; end?: string };
 
     let startDate: Date;
@@ -44,6 +44,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       startDate = new Date(start);
       endDate = new Date(end);
     } else {
+      // Default: last 7 days
       endDate = new Date();
       startDate = new Date(endDate.getTime() - 7 * 24 * 60 * 60 * 1000);
     }
@@ -67,7 +68,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const activities = await apiRes.json();
 
-    // Filter to runs in the selected date range
+    // Runs in the selected range (inclusive)
     const runsInRange = activities.filter((act: any) =>
       act.sport_type === 'Run' &&
       act.start_date >= startIso &&
@@ -78,7 +79,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       (sum: number, act: any) => sum + act.distance / 1000,
       0
     );
-
     const totalRuns = runsInRange.length;
 
     const avgSpeed =
@@ -89,7 +89,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           ) / totalRuns
         : 0;
 
-    // Average pace in minutes per km (as mm:ss string)
+    // Average pace in minutes per km, formatted mm:ss
     let avgPacePerKm = 'N/A';
     if (avgSpeed > 0) {
       const secondsPerKm = 1000 / avgSpeed;
@@ -103,7 +103,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (typeof act.kilojoules === 'number') {
           return sum + act.kilojoules * 0.239; // kJ → kcal approx
         }
-        return sum + (act.distance / 1000) * 90; // fallback estimate
+        return sum + (act.distance / 1000) * 90; // rough fallback
       }, 0)
     );
 
@@ -113,6 +113,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             ...runsInRange.map((act: any) => act.distance / 1000)
           )
         : 0;
+
+    // Also compute simple all‑time totals for context
+    const allRuns = activities.filter((act: any) => act.sport_type === 'Run');
+    const allKm = allRuns.reduce(
+      (sum: number, act: any) => sum + act.distance / 1000,
+      0
+    );
 
     res.status(200).json({
       range: {
@@ -124,7 +131,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         totalRuns,
         avgPacePerKm,
         calories,
-        longestRunKm: Number(longestRunKm.toFixed(1))
+        longestRunKm: Number(longestRunKm.toFixed(1)),
+        allTimeKm: Number(allKm.toFixed(1)),
+        allTimeRuns: allRuns.length
       },
       activities: runsInRange
     });
