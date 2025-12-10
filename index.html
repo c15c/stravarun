@@ -160,6 +160,16 @@
         text-align: left;
       }
     }
+      .running-quote-text {
+      font-size: 1.25rem;
+      line-height: 1.4;
+      margin: 0;
+    }
+
+    .running-quote-author {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
   </style>
 </head>
 <body>
@@ -280,10 +290,12 @@
 
       <!-- Placeholder / spare card -->
       <div class="card" id="running-quote-card">
-  <div class="card-title">Running quote</div>
-  <div class="card-sub" id="running-quote-text">Loading…</div>
-  <div class="card-sub" id="running-quote-author"></div>
-</div>
+        <div class="card-title">Quotes</div>
+        <div class="card-sub">
+          <h3 class="running-quote-text" id="running-quote-text">Loading…</h3>
+          <div class="running-quote-author" id="running-quote-author"></div>
+        </div>
+      </div>
     </div>
   </div>
 
