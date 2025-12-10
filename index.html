@@ -279,12 +279,11 @@
       </div>
 
       <!-- Placeholder / spare card -->
-      <div class="card">
-        <div class="card-title">Notes</div>
-        <div class="card-sub">
-          Date range is applied server-side via <code>/api/strava?start=YYYY-MM-DD&amp;end=YYYY-MM-DD</code>.
-        </div>
-      </div>
+      <div class="card" id="running-quote-card">
+  <div class="card-title">Running quote</div>
+  <div class="card-sub" id="running-quote-text">Loading…</div>
+  <div class="card-sub" id="running-quote-author"></div>
+</div>
     </div>
   </div>
 
@@ -401,5 +400,31 @@
       fetchData();
     });
   </script>
+  <script>
+  async function fetchRunningQuote() {
+    try {
+      // Example with Quotable random quote endpoint
+      const res = await fetch("https://api.quotable.io/random");
+      const data = await res.json();
+
+      // Simple keyword filter; if it doesn't look running-related,
+      // just show whatever came back or you can retry.
+      const text = data.content || "";
+      const looksRunning =
+        /run|runner|running|mile|marathon|race/i.test(text);
+
+      document.getElementById("running-quote-text").textContent =
+        looksRunning ? text : "One run at a time.";
+      document.getElementById("running-quote-author").textContent =
+        data.author ? "— " + data.author : "";
+    } catch (e) {
+      document.getElementById("running-quote-text").textContent =
+        "Lace up, show up, never give up.";
+      document.getElementById("running-quote-author").textContent = "";
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", fetchRunningQuote);
+</script>
 </body>
 </html>
