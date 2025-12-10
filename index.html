@@ -1,407 +1,405 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Strava Running Dashboard</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background: linear-gradient(to bottom right, #111827, #000000, #111827);
-            min-height: 100vh;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            color: white;
-            padding: 1.5rem;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        .icon-box {
-            background: rgba(250, 204, 21, 0.1);
-            padding: 0.75rem;
-            border-radius: 0.75rem;
-            border: 1px solid rgba(250, 204, 21, 0.3);
-        }
-        .title {
-            font-size: 2.5rem;
-            font-weight: bold;
-            background: linear-gradient(to right, #facc15, #fde047, #facc15);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .status {
-            color: #6b7280;
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-        }
-        .time-area {
-            text-align: right;
-        }
-        .time {
-            font-size: 3rem;
-            font-weight: bold;
-            color: #facc15;
-        }
-        .date {
-            color: #6b7280;
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1.25rem;
-            margin-bottom: 1.25rem;
-        }
-        .card {
-            background: linear-gradient(to bottom right, rgba(31, 41, 55, 0.5), rgba(17, 24, 39, 0.5));
-            border-radius: 1.5rem;
-            padding: 2rem;
-            border: 1px solid rgba(250, 204, 21, 0.2);
-            backdrop-filter: blur(10px);
-        }
-        .card-large {
-            grid-column: span 2;
-        }
-        .card-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-        }
-        .card-icon {
-            background: rgba(250, 204, 21, 0.1);
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-        }
-        .card-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #facc15;
-        }
-        .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 2rem;
-        }
-        .stat-value {
-            font-size: 3.75rem;
-            font-weight: bold;
-            background: linear-gradient(to bottom right, #facc15, #fde047);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 0.5rem;
-        }
-        .stat-label {
-            color: #6b7280;
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 600;
-        }
-        .progress-bar {
-            margin-top: 2rem;
-        }
-        .progress-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.75rem;
-            font-size: 0.875rem;
-        }
-        .progress-track {
-            height: 1rem;
-            background: rgba(31, 41, 55, 0.8);
-            border-radius: 9999px;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(to right, #facc15, #fde047, #facc15);
-            border-radius: 9999px;
-            transition: width 0.5s;
-        }
-        .progress-text {
-            color: #6b7280;
-            font-size: 0.75rem;
-            margin-top: 0.5rem;
-        }
-        .small-stat {
-            font-size: 3rem;
-        }
-        .predictions {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1.25rem;
-        }
-        .prediction-card {
-            background: rgba(31, 41, 55, 0.5);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            border: 1px solid rgba(250, 204, 21, 0.1);
-        }
-        .prediction-label {
-            color: #facc15;
-            font-size: 0.875rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.75rem;
-        }
-        .prediction-time {
-            font-size: 3rem;
-            font-weight: bold;
-            color: white;
-            margin-bottom: 0.5rem;
-        }
-        .prediction-subtitle {
-            color: #6b7280;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        .refresh-btn {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: rgba(250, 204, 21, 0.1);
-            border: 1px solid rgba(250, 204, 21, 0.3);
-            color: #facc15;
-            padding: 1rem;
-            border-radius: 9999px;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-        }
-        .refresh-btn:hover {
-            background: rgba(250, 204, 21, 0.2);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Running Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #050609;
+      --bg-card: #151822;
+      --accent: #f5c84c;
+      --text: #f6f7fb;
+      --muted: #8a8fa3;
+      --error: #ff6666;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        sans-serif;
+      background: radial-gradient(circle at top left, #262a3d, #050609 55%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 24px;
+    }
+    .dashboard {
+      max-width: 1200px;
+      width: 100%;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .title {
+      font-size: 28px;
+      font-weight: 700;
+    }
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #3bd675;
+    }
+    .clock {
+      font-size: 20px;
+      font-weight: 600;
+      text-align: right;
+    }
+    .clock small {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .date-range {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .date-range label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .date-range input[type="date"] {
+      background: #10121b;
+      border: 1px solid #26293a;
+      color: var(--text);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    .date-range button {
+      background: var(--accent);
+      color: #11121a;
+      border: none;
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 16px 18px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+      position: relative;
+      overflow: hidden;
+    }
+    .card-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .card-main {
+      font-size: 32px;
+      font-weight: 700;
+    }
+    .card-main span.small {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-left: 4px;
+    }
+    .card-sub {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .card-highlight {
+      background: linear-gradient(120deg, #32270c, #2b220f);
+      border: 1px solid rgba(245, 200, 76, 0.45);
+    }
+
+    .error-text {
+      color: var(--error);
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 600px) {
+      body { padding: 12px; }
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .clock {
+        text-align: left;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo-area">
-            <div class="icon-box">
-                <svg width="32" height="32" fill="none" stroke="#facc15" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                </svg>
-            </div>
-            <div>
-                <div class="title">Running Dashboard</div>
-                <div class="status" id="status">● Connected to Strava</div>
-            </div>
+  <div class="dashboard">
+    <header>
+      <div>
+        <div class="title">Running Dashboard</div>
+        <div class="status">
+          <span class="status-dot"></span>
+          <span id="connection-status">Connected to Strava</span>
         </div>
-        <div class="time-area">
-            <div class="time" id="time">00:00</div>
-            <div class="date" id="date">Loading...</div>
-        </div>
+      </div>
+      <div class="clock">
+        <span id="clock-time">00:00</span>
+        <small id="clock-date">Loading…</small>
+      </div>
+    </header>
+
+    <div class="date-range">
+      <strong>Date range:</strong>
+      <label>
+        From
+        <input type="date" id="start-date" />
+      </label>
+      <label>
+        To
+        <input type="date" id="end-date" />
+      </label>
+      <button id="apply-range">Apply</button>
+      <span id="range-label"></span>
     </div>
+
+    <div id="error-message" class="error-text" style="display:none;"></div>
 
     <div class="grid">
-        <div class="card card-large">
-            <div class="card-header">
-                <div class="card-icon">
-                    <svg width="24" height="24" fill="none" stroke="#facc15" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                </div>
-                <div class="card-title">This Week</div>
-            </div>
-            <div class="stat-grid">
-                <div>
-                    <div class="stat-value" id="weekDistance">0.0</div>
-                    <div class="stat-label">Kilometers</div>
-                </div>
-                <div>
-                    <div class="stat-value" id="weekRuns">0</div>
-                    <div class="stat-label">Runs</div>
-                </div>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-header">
-                    <span style="font-weight: 600; color: #9ca3af;">Weekly Goal</span>
-                    <span style="font-weight: bold; color: #facc15;" id="weekProgress">0%</span>
-                </div>
-                <div class="progress-track">
-                    <div class="progress-fill" id="progressBar" style="width: 0%"></div>
-                </div>
-                <div class="progress-text" id="progressText">50.0 km remaining</div>
-            </div>
+      <!-- Selected range: distance + runs -->
+      <div class="card">
+        <div class="card-title">This Range</div>
+        <div class="card-main">
+          <span id="range-km">0.0</span>
+          <span class="small">km</span>
         </div>
+        <div class="card-sub">
+          <span id="range-runs">0</span> runs in selected range
+        </div>
+      </div>
 
-        <div class="card">
-            <div class="card-header">
-                <div class="card-icon">
-                    <svg width="20" height="20" fill="none" stroke="#facc15" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                    </svg>
-                </div>
-                <div style="font-weight: 600; color: #facc15;">Avg Pace</div>
-            </div>
-            <div class="stat-value small-stat" id="avgPace">0:00</div>
-            <div class="stat-label">per kilometer</div>
+      <!-- Average pace -->
+      <div class="card">
+        <div class="card-title">Avg Pace</div>
+        <div class="card-main">
+          <span id="avg-pace">0:00</span>
+          <span class="small">per kilometer</span>
         </div>
+        <div class="card-sub">
+          Average pace for runs in selected range
+        </div>
+      </div>
 
-        <div class="card">
-            <div class="card-header">
-                <div class="card-icon">
-                    <svg width="20" height="20" fill="none" stroke="#facc15" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
-                    </svg>
-                </div>
-                <div style="font-weight: 600; color: #facc15;">Longest Run</div>
-            </div>
-            <div class="stat-value small-stat" id="longestRun">0.0</div>
-            <div class="stat-label">kilometers</div>
+      <!-- Longest run -->
+      <div class="card">
+        <div class="card-title">Longest Run</div>
+        <div class="card-main">
+          <span id="longest-run">0.0</span>
+          <span class="small">kilometers</span>
         </div>
+        <div class="card-sub">
+          Longest single run in selected range
+        </div>
+      </div>
 
-        <div class="card">
-            <div class="card-header">
-                <div class="card-icon">
-                    <svg width="20" height="20" fill="none" stroke="#facc15" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-                    </svg>
-                </div>
-                <div style="font-weight: 600; color: #facc15;">This Month</div>
-            </div>
-            <div class="stat-value small-stat" id="monthDistance">0.0</div>
-            <div class="stat-label">kilometers</div>
+      <!-- Calories -->
+      <div class="card card-highlight">
+        <div class="card-title">Calories Burned</div>
+        <div class="card-main">
+          <span id="calories">0</span>
+          <span class="small">this range</span>
         </div>
+        <div class="card-sub">
+          Estimated calories from runs (Strava kilojoules where available)
+        </div>
+      </div>
 
-        <div class="card">
-            <div class="card-header">
-                <div class="card-icon">
-                    <svg width="20" height="20" fill="none" stroke="#facc15" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-                <div style="font-weight: 600; color: #facc15;">Total Runs</div>
-            </div>
-            <div class="stat-value small-stat" id="totalRuns">0</div>
-            <div class="stat-label">all time</div>
+      <!-- This Month (last 30 days) -->
+      <div class="card">
+        <div class="card-title">This Month</div>
+        <div class="card-main">
+          <span id="month-km">0.0</span>
+          <span class="small">kilometers</span>
         </div>
+        <div class="card-sub">
+          Total run distance in approximately last 30 days
+        </div>
+      </div>
 
-        <div class="card card-large" style="background: linear-gradient(to bottom right, rgba(250, 204, 21, 0.1), rgba(253, 224, 71, 0.05)); border-color: rgba(250, 204, 21, 0.3);">
-            <div class="card-header">
-                <div style="background: rgba(250, 204, 21, 0.2); padding: 0.5rem; border-radius: 0.5rem;">
-                    <svg width="24" height="24" fill="none" stroke="#facc15" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                    </svg>
-                </div>
-                <div style="font-size: 1.25rem; font-weight: 600; color: #facc15;">Calories Burned</div>
-            </div>
-            <div style="display: flex; align-items: baseline; gap: 0.75rem;">
-                <div class="stat-value" id="calories">0</div>
-                <div style="color: #6b7280; font-size: 0.875rem; margin-bottom: 0.75rem;">this week</div>
-            </div>
+      <!-- All-time runs -->
+      <div class="card">
+        <div class="card-title">Total Runs</div>
+        <div class="card-main">
+          <span id="all-runs">0</span>
         </div>
+        <div class="card-sub">
+          All-time runs pulled from Strava
+        </div>
+      </div>
+
+      <!-- All-time distance -->
+      <div class="card">
+        <div class="card-title">All-Time Distance</div>
+        <div class="card-main">
+          <span id="all-km">0.0</span>
+          <span class="small">kilometers</span>
+        </div>
+        <div class="card-sub">
+          Sum of all run distances returned by Strava
+        </div>
+      </div>
+
+      <!-- Placeholder / spare card -->
+      <div class="card">
+        <div class="card-title">Notes</div>
+        <div class="card-sub">
+          Date range is applied server-side via <code>/api/strava?start=YYYY-MM-DD&amp;end=YYYY-MM-DD</code>.
+        </div>
+      </div>
     </div>
+  </div>
 
-    <div class="card">
-        <div class="card-header">
-            <div class="card-icon">
-                <svg width="24" height="24" fill="none" stroke="#facc15" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-                </svg>
-            </div>
-            <div class="card-title">Performance Predictions</div>
-            <span style="color: #4b5563; font-size: 0.75rem; margin-left: 0.5rem;">(Requires Strava Premium)</span>
-        </div>
-        <div class="predictions">
-            <div class="prediction-card">
-                <div class="prediction-label">5K</div>
-                <div class="prediction-time">24:15</div>
-                <div class="prediction-subtitle">Predicted Time</div>
-            </div>
-            <div class="prediction-card">
-                <div class="prediction-label">10K</div>
-                <div class="prediction-time">50:32</div>
-                <div class="prediction-subtitle">Predicted Time</div>
-            </div>
-            <div class="prediction-card">
-                <div class="prediction-label">Half Marathon</div>
-                <div class="prediction-time">1:52:45</div>
-                <div class="prediction-subtitle">Predicted Time</div>
-            </div>
-            <div class="prediction-card">
-                <div class="prediction-label">Marathon</div>
-                <div class="prediction-time">3:58:20</div>
-                <div class="prediction-subtitle">Predicted Time</div>
-            </div>
-        </div>
-    </div>
+  <script>
+    function updateClock() {
+      const now = new Date();
+      const timeEl = document.getElementById('clock-time');
+      const dateEl = document.getElementById('clock-date');
+      if (!timeEl || !dateEl) return;
 
-    <button class="refresh-btn" onclick="fetchData()" title="Refresh data">
-        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-        </svg>
-    </button>
+      const hours = now.getHours().toString().padStart(2, '0');
+      const mins = now.getMinutes().toString().padStart(2, '0');
+      timeEl.textContent = `${hours}:${mins}`;
 
-    <script>
-        const ACCESS_TOKEN = '56f52015388197a4f265b91f90d5272425722fcb';
-        const WEEK_GOAL = 50;
+      const options = { weekday: 'long', day: 'numeric', month: 'short' };
+      dateEl.textContent = now.toLocaleDateString(undefined, options);
+    }
 
-        function updateTime() {
-            const now = new Date();
-            document.getElementById('time').textContent = now.toLocaleTimeString('en-US', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-            });
-            document.getElementById('date').textContent = now.toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                month: 'short', 
-                day: 'numeric' 
-            });
+    function setDefaultRange() {
+      const startInput = document.getElementById('start-date');
+      const endInput = document.getElementById('end-date');
+      if (!startInput || !endInput) return;
+
+      const today = new Date();
+      const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+      endInput.value = today.toISOString().slice(0, 10);
+      startInput.value = sevenDaysAgo.toISOString().slice(0, 10);
+    }
+
+    function updateRangeLabel(range) {
+      const label = document.getElementById('range-label');
+      if (!label || !range) return;
+      const start = new Date(range.start);
+      const end = new Date(range.end);
+      label.textContent =
+        `Showing runs from ${start.toLocaleDateString()} to ${end.toLocaleDateString()}`;
+    }
+
+    async function fetchData() {
+      const errorEl = document.getElementById('error-message');
+      if (errorEl) errorEl.style.display = 'none';
+
+      const startInput = document.getElementById('start-date');
+      const endInput = document.getElementById('end-date');
+
+      const params = new URLSearchParams();
+      if (startInput && startInput.value) params.append('start', startInput.value);
+      if (endInput && endInput.value) params.append('end', endInput.value);
+
+      const url = params.toString() ? `/api/strava?${params}` : '/api/strava';
+
+      try {
+        const res = await fetch(url);
+        if (!res.ok) {
+          throw new Error(`API ${res.status}`);
         }
+        const data = await res.json();
 
-        async function fetchData() {
-  try {
-    const response = await fetch('/api/strava');
-    const data = await response.json();
-    
-    document.getElementById('weekDistance').textContent = data.weekDistance;
-    document.getElementById('weekRuns').textContent = data.weekRuns;
-    document.getElementById('avgPace').textContent = data.avgPace;
-    document.getElementById('longestRun').textContent = data.longestRun;
-    document.getElementById('monthDistance').textContent = data.monthDistance;
-    document.getElementById('totalRuns').textContent = data.totalRuns;
-    document.getElementById('calories').textContent = parseInt(data.calories).toLocaleString();
-    
-    const progress = (parseFloat(data.weekDistance) / 50) * 100;
-    document.getElementById('weekProgress').textContent = Math.round(progress) + '%';
-    document.getElementById('progressBar').style.width = Math.min(progress, 100) + '%';
-    
-    const remaining = 50 - parseFloat(data.weekDistance);
-    document.getElementById('progressText').textContent = remaining > 0 
-      ? `${remaining.toFixed(1)} km remaining`
-      : '🎉 Goal achieved!';
-    
-    document.getElementById('status').textContent = '● Connected to Strava';
-    document.getElementById('status').style.color = '#10b981';
-  } catch (error) {
-    console.error('Error:', error);
-    document.getElementById('status').textContent = '○ Connection error';
-    document.getElementById('status').style.color = '#ef4444';
-  }
-}
+        // Update range label
+        updateRangeLabel(data.range);
 
-        // Initialize
-        updateTime();
-        fetchData();
-        setInterval(updateTime, 1000);
-        setInterval(fetchData, 5 * 60 * 1000);
-    </script>
+        const s = data.summary || {};
+        const activities = data.activities || [];
+
+        document.getElementById('range-km').textContent =
+          (s.totalKm ?? 0).toFixed ? s.totalKm.toFixed(1) : s.totalKm || '0.0';
+        document.getElementById('range-runs').textContent =
+          s.totalRuns ?? activities.length ?? 0;
+        document.getElementById('avg-pace').textContent =
+          s.avgPacePerKm || 'N/A';
+        document.getElementById('longest-run').textContent =
+          s.longestRunKm != null ? s.longestRunKm.toFixed(1) : '0.0';
+        document.getElementById('calories').textContent =
+          s.calories != null ? s.calories.toString() : '0';
+
+        document.getElementById('all-km').textContent =
+          s.allTimeKm != null ? s.allTimeKm.toFixed(1) : '0.0';
+        document.getElementById('all-runs').textContent =
+          s.allTimeRuns != null ? s.allTimeRuns.toString() : '0';
+
+        // Approximate "this month" as last 30 days using activities we already have
+        const monthKmEl = document.getElementById('month-km');
+        if (monthKmEl) {
+          const now = Date.now();
+          const thirtyAgo = now - 30 * 24 * 60 * 60 * 1000;
+          const monthKm = activities
+            .filter((a) => new Date(a.start_date).getTime() >= thirtyAgo)
+            .reduce((sum, a) => sum + a.distance / 1000, 0);
+          monthKmEl.textContent = monthKm.toFixed(1);
+        }
+      } catch (err) {
+        console.error(err);
+        if (errorEl) {
+          errorEl.textContent =
+            'Failed to load data from Strava. Please try again in a moment.';
+          errorEl.style.display = 'block';
+        }
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      setDefaultRange();
+      updateClock();
+      setInterval(updateClock, 30 * 1000); // update every 30s
+
+      const apply = document.getElementById('apply-range');
+      if (apply) {
+        apply.addEventListener('click', () => {
+          fetchData();
+        });
+      }
+
+      fetchData();
+    });
+  </script>
 </body>
 </html>
