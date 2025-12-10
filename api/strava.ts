@@ -40,14 +40,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let startDate: Date;
     let endDate: Date;
 
-    if (start && end) {
+      if (start && end) {
       startDate = new Date(start);
       endDate = new Date(end);
     } else {
-      // Default: last 7 days
-      endDate = new Date();
-      startDate = new Date(endDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+      // Default: this week, starting Monday (local time)
+      const nowLocal = new Date();
+      endDate = nowLocal;
+
+      const day = nowLocal.getDay(); // 0 = Sunday, 1 = Monday, ...
+      const diffToMonday = (day + 6) % 7; // days since Monday
+      startDate = new Date(
+        nowLocal.getFullYear(),
+        nowLocal.getMonth(),
+        nowLocal.getDate() - diffToMonday,
+        0,
+        0,
+        0,
+        0
+      );
     }
+
 
     const startIso = startDate.toISOString();
     const endIso = endDate.toISOString();
