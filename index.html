@@ -487,20 +487,16 @@ function toDateOnly(d) {
 
 function getWeekRange() {
   const now = new Date();
-  const day = now.getDay(); // 0=Sun
-  const diffToMonday = (day + 6) % 7;
+  const day = now.getDay(); // 0=Sun, 1=Mon, etc
+  const diffToMonday = (day === 0 ? 6 : day - 1); // Simple: if Sunday, go back 6, else go back (day - 1)
 
-  const monday = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate() - diffToMonday
-  );
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - diffToMonday);
+  monday.setHours(0, 0, 0, 0);
 
-  const sunday = new Date(
-    monday.getFullYear(),
-    monday.getMonth(),
-    monday.getDate() + 6
-  );
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  sunday.setHours(23, 59, 59, 999);
 
   return {
     start: toDateOnly(monday),
