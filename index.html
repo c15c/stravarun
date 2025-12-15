@@ -15,8 +15,7 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-        sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
       background: radial-gradient(circle at top left, #262a3d, #050609 55%);
       color: var(--text);
       min-height: 100vh;
@@ -25,44 +24,18 @@
       align-items: flex-start;
       padding: 40px 32px 32px;
     }
-    .dashboard {
-      max-width: 1200px;
-      width: 100%;
-    }
+    .dashboard { max-width: 1200px; width: 100%; }
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 16px;
     }
-    .title {
-      font-size: 24px;
-      font-weight: 700;
-    }
-    .status {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      color: var(--muted);
-    }
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: #3bd675;
-    }
-    .clock {
-      font-size: 20px;
-      font-weight: 600;
-      text-align: right;
-    }
-    .clock small {
-      display: block;
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 400;
-    }
+    .title { font-size: 24px; font-weight: 700; }
+    .status { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+    .status-dot { width: 8px; height: 8px; border-radius: 999px; background: #3bd675; }
+    .clock { font-size: 20px; font-weight: 600; text-align: right; }
+    .clock small { display: block; font-size: 12px; color: var(--muted); }
 
     .date-range {
       display: flex;
@@ -71,29 +44,21 @@
       margin-bottom: 16px;
       font-size: 13px;
       color: var(--muted);
+      flex-wrap: wrap;
     }
-    .date-range label {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .date-range input[type="date"] {
+    .range-btn {
       background: #10121b;
       border: 1px solid #26293a;
       color: var(--text);
-      padding: 4px 8px;
-      border-radius: 4px;
+      padding: 6px 14px;
+      border-radius: 999px;
       font-size: 13px;
+      cursor: pointer;
     }
-    .date-range button {
+    .range-btn.active {
       background: var(--accent);
       color: #11121a;
-      border: none;
-      border-radius: 999px;
-      padding: 6px 14px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
+      border-color: transparent;
     }
 
     .grid {
@@ -107,8 +72,6 @@
       padding: 18px 20px;
       min-height: 120px;
       box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
-      position: relative;
-      overflow: hidden;
     }
     .card-title {
       font-size: 13px;
@@ -117,108 +80,33 @@
       color: var(--muted);
       margin-bottom: 12px;
     }
-    .card-main {
-      font-size: 32px;
-      font-weight: 700;
-    }
-    .card-main span.small {
-      font-size: 18px;
-      font-weight: 500;
-      color: var(--muted);
-      margin-left: 4px;
-    }
-    .card-sub {
-      margin-top: 6px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-    .card-highlight {
-      border: 1px solid rgba(245, 200, 76, 0.45);
-    }
+    .card-main { font-size: 32px; font-weight: 700; }
+    .card-main span.small { font-size: 18px; font-weight: 500; color: var(--muted); margin-left: 4px; }
+    .card-sub { margin-top: 6px; font-size: 12px; color: var(--muted); }
+    .card-highlight { border: 1px solid rgba(245, 200, 76, 0.45); }
 
-    .error-text {
-      color: var(--error);
-      font-size: 12px;
-      margin-top: 8px;
-    }
+    .error-text { color: var(--error); font-size: 12px; margin-top: 8px; }
 
-    /* Quote card layout */
-    .card-quote {
-      grid-column: span 2;
-    }
-    .quote-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .quote-text {
-      flex: 1 1 auto;
-    }
+    .card-quote { grid-column: span 2; }
+    .quote-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .card-quote .card-main { font-size: 24px; line-height: 1.3; }
     .quote-image {
-      flex: 0 0 auto;
       max-height: 72px;
       max-width: 72px;
-      height: auto;
-      width: auto;
-      object-fit: contain;
       border-radius: 50%;
-      transform-origin: 50% 90%;    /* pivot near the chin */
+      transform-origin: 50% 90%;
       animation: headshake 1.6s ease-in-out infinite;
-    }
-
-    .card-quote .card-main {
-      font-size: 24px;
-      line-height: 1.3;
+      cursor: pointer;
     }
 
     @keyframes headshake {
-      0%   { transform: rotate(0deg); }
-      20%  { transform: rotate(-6deg); }
-      40%  { transform: rotate(6deg); }
-      60%  { transform: rotate(-4deg); }
-      80%  { transform: rotate(4deg); }
+      0% { transform: rotate(0deg); }
+      20% { transform: rotate(-6deg); }
+      40% { transform: rotate(6deg); }
+      60% { transform: rotate(-4deg); }
+      80% { transform: rotate(4deg); }
       100% { transform: rotate(0deg); }
     }
-
-    @media (max-width: 900px) {
-      .grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-    @media (max-width: 600px) {
-      body { padding: 12px; }
-      .grid {
-        grid-template-columns: 1fr;
-      }
-      .card-quote {
-        grid-column: span 1;
-      }
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-      }
-      .clock {
-        text-align: left;
-      }
-    }
-
-    .range-btn {
-  background: #10121b;
-  border: 1px solid #26293a;
-  color: var(--text);
-  padding: 6px 14px;
-  border-radius: 999px;
-  font-size: 13px;
-  cursor: pointer;
-}
-.range-btn.active {
-  background: var(--accent);
-  color: #11121a;
-  border-color: transparent;
-}
-
   </style>
 </head>
 <body>
@@ -237,9 +125,8 @@
       </div>
     </header>
 
-  <!-- Date buttons -->
-  <div class="date-range">
-    <strong>Range:</strong>
+    <div class="date-range">
+      <strong>Range:</strong>
       <button class="range-btn" data-range="week">Week</button>
       <button class="range-btn" data-range="month">Month</button>
       <button class="range-btn" data-range="year">Year</button>
@@ -249,100 +136,49 @@
     <div id="error-message" class="error-text" style="display:none;"></div>
 
     <div class="grid">
-      <!-- Selected range: distance + runs -->
       <div class="card">
         <div class="card-title">This Range</div>
-        <div class="card-main">
-          <span id="range-km">0.0</span>
-          <span class="small">km</span>
-        </div>
-        <div class="card-sub">
-          <span id="range-runs">0</span> runs in range
-        </div>
+        <div class="card-main"><span id="range-km">0.0</span><span class="small">km</span></div>
+        <div class="card-sub"><span id="range-runs">0</span> runs in range</div>
       </div>
-      
 
-
-
-      <!-- Average pace -->
       <div class="card">
         <div class="card-title">Avg Pace</div>
-        <div class="card-main">
-          <span id="avg-pace">0:00</span>
-          <span class="small">per kilometer</span>
-        </div>
-        <div class="card-sub">
-          Average pace for range
-        </div>
+        <div class="card-main"><span id="avg-pace">0:00</span><span class="small">per kilometer</span></div>
+        <div class="card-sub">Average pace for range</div>
       </div>
 
-      <!-- Longest run -->
       <div class="card">
         <div class="card-title">Longest Run</div>
-        <div class="card-main">
-          <span id="longest-run">0.0</span>
-          <span class="small">kilometers</span>
-        </div>
-        <div class="card-sub">
-          Longest single run in range
-        </div>
+        <div class="card-main"><span id="longest-run">0.0</span><span class="small">kilometers</span></div>
+        <div class="card-sub">Longest single run in range</div>
       </div>
 
-      <!-- Calories -->
       <div class="card card-highlight">
         <div class="card-title">Calories Burned</div>
-        <div class="card-main">
-          <span id="calories">0</span>
-        </div>
-        <div class="card-sub">
-          Estimated calories from runs
-        </div>
+        <div class="card-main"><span id="calories">0</span></div>
       </div>
 
-      <!-- This Month (month-to-date from API) -->
       <div class="card card-highlight">
         <div class="card-title">This Month</div>
-        <div class="card-main">
-          <span id="month-km">0.0</span>
-          <span class="small">kilometers</span>
-        </div>
-        <div class="card-sub">
-          Total run distance this month
-        </div>
+        <div class="card-main"><span id="month-km">0.0</span><span class="small">kilometers</span></div>
       </div>
 
-      <!-- All-time runs -->
       <div class="card card-highlight">
         <div class="card-title">Total Runs</div>
-        <div class="card-main">
-          <span id="all-runs">0</span>
-        </div>
-        <div class="card-sub">
-          All-time runs
-        </div>
+        <div class="card-main"><span id="all-runs">0</span></div>
       </div>
 
-      <!-- All-time distance -->
       <div class="card">
         <div class="card-title">All-Time Distance</div>
-        <div class="card-main">
-          <span id="all-km">0.0</span>
-          <span class="small">kilometers</span>
-        </div>
-        <div class="card-sub">
-          Sum of all runs
-        </div>
+        <div class="card-main"><span id="all-km">0.0</span><span class="small">kilometers</span></div>
       </div>
 
-      <!-- Quote card -->
       <div class="card card-quote">
         <div class="quote-inner">
-          <div class="quote-text">
+          <div>
             <div class="card-title">Coach Bennett</div>
-            <div class="card-main" id="quote-text">
-              Every run has a purpose.
-            </div>
-            <div class="card-sub" id="quote-sub"></div>
+            <div class="card-main" id="quote-text">Every run has a purpose.</div>
           </div>
           <img
             class="quote-image"
@@ -386,169 +222,106 @@
     ];
 
     function setRandomQuote() {
-      const quoteEl = document.getElementById('quote-text');
-      if (!quoteEl || runningQuotes.length === 0) return;
-      const idx = Math.floor(Math.random() * runningQuotes.length);
-      quoteEl.textContent = runningQuotes[idx];
+      const el = document.getElementById('quote-text');
+      if (!el) return;
+      el.textContent = runningQuotes[Math.floor(Math.random() * runningQuotes.length)];
     }
 
     function updateClock() {
       const now = new Date();
-      const timeEl = document.getElementById('clock-time');
-      const dateEl = document.getElementById('clock-date');
-      if (!timeEl || !dateEl) return;
-
-      const hours = now.getHours().toString().padStart(2, '0');
-      const mins = now.getMinutes().toString().padStart(2, '0');
-      timeEl.textContent = `${hours}:${mins}`;
-
-      const options = { weekday: 'long', day: 'numeric', month: 'short' };
-      dateEl.textContent = now.toLocaleDateString(undefined, options);
+      document.getElementById('clock-time').textContent =
+        now.getHours().toString().padStart(2, '0') + ':' +
+        now.getMinutes().toString().padStart(2, '0');
+      document.getElementById('clock-date').textContent =
+        now.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'short' });
     }
 
+    function formatDateOnly(iso) {
+      const [y, m, d] = iso.slice(0, 10).split('-');
+      return new Date(y, m - 1, d).toLocaleDateString();
+    }
 
     function updateRangeLabel(range) {
-      const label = document.getElementById('range-label');
-      if (!label || !range) return;
-      const start = new Date(range.start);
-      const end = new Date(range.end);
-      label.textContent =
-        `Showing runs from ${start.toLocaleDateString()} to ${end.toLocaleDateString()}`;
-    }
-
-    async function fetchData(range) {
-  const params = new URLSearchParams();
-
-  if (range?.start && range?.end) {
-    params.append('start', range.start.toISOString().slice(0, 10));
-    params.append('end', range.end.toISOString().slice(0, 10));
-  }
-
-  const url = params.toString() ? `/api/strava?${params}` : '/api/strava';
-
-      try {
-        const res = await fetch(url);
-        if (!res.ok) {
-          throw new Error(`API ${res.status}`);
-        }
-        const data = await res.json();
-
-        updateRangeLabel(data.range);
-
-        const s = data.summary || {};
-        const activities = data.activities || [];
-
-        document.getElementById('range-km').textContent =
-          s.totalKm != null ? s.totalKm.toFixed(1) : '0.0';
-        document.getElementById('range-runs').textContent =
-          s.totalRuns != null ? s.totalRuns : activities.length || 0;
-        document.getElementById('avg-pace').textContent =
-          s.avgPacePerKm || 'N/A';
-        document.getElementById('longest-run').textContent =
-          s.longestRunKm != null ? s.longestRunKm.toFixed(1) : '0.0';
-        document.getElementById('calories').textContent =
-          s.calories != null ? s.calories.toString() : '0';
-
-        document.getElementById('all-km').textContent =
-          s.allTimeKm != null ? s.allTimeKm.toFixed(1) : '0.0';
-        document.getElementById('all-runs').textContent =
-          s.allTimeRuns != null ? s.allTimeRuns.toString() : '0';
-
-        const monthKmEl = document.getElementById('month-km');
-        if (monthKmEl) {
-          if (s.monthKm != null) {
-            monthKmEl.textContent = s.monthKm.toFixed(1);
-          } else {
-            monthKmEl.textContent = '0.0';
-          }
-        }
-      } catch (err) {
-        console.error(err);
-        if (errorEl) {
-          errorEl.textContent =
-            'Failed to load data from Strava. Please try again in a moment.';
-          errorEl.style.display = 'block';
-        }
-      }
+      document.getElementById('range-label').textContent =
+        `Showing runs from ${formatDateOnly(range.start)} to ${formatDateOnly(range.end)}`;
     }
 
     function getWeekRange() {
-  const now = new Date();
-  const day = now.getDay(); // 0=Sun
-  const diffToMonday = (day + 6) % 7;
+      const now = new Date();
+      const diff = (now.getDay() + 6) % 7;
+      const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - diff);
+      const sunday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6);
+      return { start: monday, end: sunday };
+    }
 
-  const start = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate() - diffToMonday,
-    0, 0, 0, 0
-  );
+    function getMonthRange() {
+      const now = new Date();
+      return {
+        start: new Date(now.getFullYear(), now.getMonth(), 1),
+        end: new Date(now.getFullYear(), now.getMonth() + 1, 0)
+      };
+    }
 
-  const end = new Date(
-    start.getFullYear(),
-    start.getMonth(),
-    start.getDate() + 6,
-    23, 59, 59, 999
-  );
+    function getYearRange() {
+      const now = new Date();
+      return {
+        start: new Date(now.getFullYear(), 0, 1),
+        end: new Date(now.getFullYear(), 11, 31)
+      };
+    }
 
-  return { start, end };
-}
+    async function fetchData(range) {
+      const errorEl = document.getElementById('error-message');
+      errorEl.style.display = 'none';
 
-function getMonthRange() {
-  const now = new Date();
-  return {
-    start: new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0),
-    end: new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999)
-  };
-}
+      try {
+        const params = new URLSearchParams();
+        params.append('start', range.start.toISOString().slice(0, 10));
+        params.append('end', range.end.toISOString().slice(0, 10));
 
-function getYearRange() {
-  const now = new Date();
-  return {
-    start: new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0),
-    end: new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999)
-  };
-}
+        const res = await fetch(`/api/strava?${params}`);
+        if (!res.ok) throw new Error(res.status);
+
+        const data = await res.json();
+        updateRangeLabel(data.range);
+
+        const s = data.summary;
+        document.getElementById('range-km').textContent = s.totalKm.toFixed(1);
+        document.getElementById('range-runs').textContent = s.totalRuns;
+        document.getElementById('avg-pace').textContent = s.avgPacePerKm;
+        document.getElementById('longest-run').textContent = s.longestRunKm.toFixed(1);
+        document.getElementById('calories').textContent = s.calories;
+        document.getElementById('month-km').textContent = s.monthKm.toFixed(1);
+        document.getElementById('all-km').textContent = s.allTimeKm.toFixed(1);
+        document.getElementById('all-runs').textContent = s.allTimeRuns;
+      } catch (e) {
+        errorEl.textContent = 'Failed to load data from Strava.';
+        errorEl.style.display = 'block';
+        document.getElementById('connection-status').textContent = 'Disconnected';
+      }
+    }
+
     document.querySelectorAll('.range-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document
-      .querySelectorAll('.range-btn')
-      .forEach(b => b.classList.remove('active'));
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
 
-    btn.classList.add('active');
+        let range;
+        if (btn.dataset.range === 'week') range = getWeekRange();
+        if (btn.dataset.range === 'month') range = getMonthRange();
+        if (btn.dataset.range === 'year') range = getYearRange();
 
-    let range;
-    if (btn.dataset.range === 'week') range = getWeekRange();
-    if (btn.dataset.range === 'month') range = getMonthRange();
-    if (btn.dataset.range === 'year') range = getYearRange();
-
-    setRandomQuote();
-    fetchData(range);
-  });
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-  setRandomQuote();
-  updateClock();
-  setInterval(updateClock, 30 * 1000);
-
-  // Bennett head click = new quote + refetch current range
-  const bennettHead = document.querySelector('.quote-image');
-  if (bennettHead) {
-    bennettHead.addEventListener('click', () => {
-      setRandomQuote();
-
-      const activeBtn = document.querySelector('.range-btn.active');
-      if (activeBtn) activeBtn.click();
+        setRandomQuote();
+        fetchData(range);
+      });
     });
-  }
 
-  // Default to Week on load
-  const weekBtn = document.querySelector('.range-btn[data-range="week"]');
-  if (weekBtn) weekBtn.click();
-});
-
-
+    document.addEventListener('DOMContentLoaded', () => {
+      setRandomQuote();
+      updateClock();
+      setInterval(updateClock, 30000);
+      document.querySelector('.range-btn[data-range="week"]').click();
+    });
   </script>
 </body>
 </html>
