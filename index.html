@@ -252,6 +252,16 @@
           <span id="range-runs">0</span> runs in range
         </div>
       </div>
+      
+      <!-- Date buttons -->
+      <div class="date-range">
+        <strong>Range:</strong>
+          <button class="range-btn" data-range="week">Week</button>
+          <button class="range-btn" data-range="month">Month</button>
+          <button class="range-btn" data-range="year">Year</button>
+          <span id="range-label"></span>
+        </div>
+
 
       <!-- Average pace -->
       <div class="card">
@@ -384,25 +394,6 @@
       dateEl.textContent = now.toLocaleDateString(undefined, options);
     }
 
-    function setDefaultRange() {
-      const startInput = document.getElementById('start-date');
-      const endInput = document.getElementById('end-date');
-      if (!startInput || !endInput) return;
-
-      const today = new Date();
-      const day = today.getDay(); // 0=Sun,1=Mon,...6=Sat
-      const diffToMonday = (day + 6) % 7;
-
-      const monday = new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate() - diffToMonday,
-        0, 0, 0, 0
-      );
-
-      endInput.value = today.toISOString().slice(0, 10);
-      startInput.value = monday.toISOString().slice(0, 10);
-    }
 
     function updateRangeLabel(range) {
       const label = document.getElementById('range-label');
@@ -469,30 +460,6 @@
       }
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      setDefaultRange();
-      setRandomQuote();
-      updateClock();
-      setInterval(updateClock, 30 * 1000);
-
-      const apply = document.getElementById('apply-range');
-      if (apply) {
-        apply.addEventListener('click', () => {
-          setRandomQuote();
-          fetchData();
-        });
-      }
-
-      const bennettHead = document.querySelector('.quote-image');
-      if (bennettHead) {
-        bennettHead.addEventListener('click', () => {
-          setRandomQuote();
-          fetchData();
-        });
-      }
-
-      fetchData();
-    });
     function getWeekRange() {
   const now = new Date();
   const day = now.getDay(); // 0=Sun
@@ -553,10 +520,22 @@ document.addEventListener('DOMContentLoaded', () => {
   updateClock();
   setInterval(updateClock, 30 * 1000);
 
-  // Default to Week
+  // Bennett head click = new quote + refetch current range
+  const bennettHead = document.querySelector('.quote-image');
+  if (bennettHead) {
+    bennettHead.addEventListener('click', () => {
+      setRandomQuote();
+
+      const activeBtn = document.querySelector('.range-btn.active');
+      if (activeBtn) activeBtn.click();
+    });
+  }
+
+  // Default to Week on load
   const weekBtn = document.querySelector('.range-btn[data-range="week"]');
   if (weekBtn) weekBtn.click();
 });
+
 
   </script>
 </body>
