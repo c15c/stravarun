@@ -97,13 +97,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const activities = await apiRes.json();
 
-    // Runs in the selected range (inclusive)
-    const runsInRange = activities.filter(
-      (act: any) =>
-        act.sport_type === 'Run' &&
-        act.start_date >= startIso &&
-        act.start_date <= endIso
-    );
+     // NEW - convert activity date to timestamp for comparison:
+  const runsInRange = activities.filter((act: any) => {
+    if (act.sport_type !== 'Run') return false;
+    
+    const activityDate = new Date(act.start_date_local); // Use local date!
+    const activityTime = activityDate.getTime();
+    
+    return activityTime >= startDate.getTime() && activityTime <= endDate.getTime();
+  });
 
     // All-time runs (from this activities window Strava returns)
     const allRuns = activities.filter((act: any) => act.sport_type === 'Run');
@@ -121,12 +123,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     );
     const monthStartIso = monthStart.toISOString();
 
-    const monthRuns = activities.filter(
-      (act: any) =>
-        act.sport_type === 'Run' &&
-        act.start_date >= monthStartIso &&
-        act.start_date <= endIso
-    );
+    const monthRuns = activities.filter((act: any) => {
+    if (act.sport_type !== 'Run') return false;
+    
+    const activityDate = new Date(act.start_date_local);
+    const activityTime = activityDate.getTime();
+    
+    return activityTime >= monthStart.getTime() && activityTime <= endDate.getTime();
+  });
 
     const monthKm = monthRuns.reduce(
       (sum: number, act: any) => sum + act.distance / 1000,
