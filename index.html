@@ -405,7 +405,15 @@
       dateEl.textContent = now.toLocaleDateString(undefined, options);
     }
 
-
+    function updateRangeLabel(range) {
+      const label = document.getElementById('range-label');
+      if (!label || !range) return;
+      const start = new Date(range.start);
+      const end = new Date(range.end);
+      label.textContent =
+        `Showing runs from ${start.toLocaleDateString()} to ${end.toLocaleDateString()}`;
+    }
+    
  function formatDateOnly(iso) {
   const [y, m, d] = iso.slice(0, 10).split('-');
   return new Date(y, m - 1, d).toLocaleDateString();
