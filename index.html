@@ -203,6 +203,22 @@
         text-align: left;
       }
     }
+
+    .range-btn {
+  background: #10121b;
+  border: 1px solid #26293a;
+  color: var(--text);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.range-btn.active {
+  background: var(--accent);
+  color: #11121a;
+  border-color: transparent;
+}
+
   </style>
 </head>
 <body>
@@ -221,19 +237,6 @@
       </div>
     </header>
 
-    <div class="date-range">
-      <strong>Date range:</strong>
-      <label>
-        From
-        <input type="date" id="start-date" />
-      </label>
-      <label>
-        To
-        <input type="date" id="end-date" />
-      </label>
-      <button id="apply-range">Apply</button>
-      <span id="range-label"></span>
-    </div>
 
     <div id="error-message" class="error-text" style="display:none;"></div>
 
@@ -410,18 +413,15 @@
         `Showing runs from ${start.toLocaleDateString()} to ${end.toLocaleDateString()}`;
     }
 
-    async function fetchData() {
-      const errorEl = document.getElementById('error-message');
-      if (errorEl) errorEl.style.display = 'none';
+    async function fetchData(range) {
+  const params = new URLSearchParams();
 
-      const startInput = document.getElementById('start-date');
-      const endInput = document.getElementById('end-date');
+  if (range?.start && range?.end) {
+    params.append('start', range.start.toISOString().slice(0, 10));
+    params.append('end', range.end.toISOString().slice(0, 10));
+  }
 
-      const params = new URLSearchParams();
-      if (startInput && startInput.value) params.append('start', startInput.value);
-      if (endInput && endInput.value) params.append('end', endInput.value);
-
-      const url = params.toString() ? `/api/strava?${params}` : '/api/strava';
+  const url = params.toString() ? `/api/strava?${params}` : '/api/strava';
 
       try {
         const res = await fetch(url);
@@ -493,6 +493,71 @@
 
       fetchData();
     });
+    function getWeekRange() {
+  const now = new Date();
+  const day = now.getDay(); // 0=Sun
+  const diffToMonday = (day + 6) % 7;
+
+  const start = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() - diffToMonday,
+    0, 0, 0, 0
+  );
+
+  const end = new Date(
+    start.getFullYear(),
+    start.getMonth(),
+    start.getDate() + 6,
+    23, 59, 59, 999
+  );
+
+  return { start, end };
+}
+
+function getMonthRange() {
+  const now = new Date();
+  return {
+    start: new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0),
+    end: new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999)
+  };
+}
+
+function getYearRange() {
+  const now = new Date();
+  return {
+    start: new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0),
+    end: new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999)
+  };
+}
+    document.querySelectorAll('.range-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document
+      .querySelectorAll('.range-btn')
+      .forEach(b => b.classList.remove('active'));
+
+    btn.classList.add('active');
+
+    let range;
+    if (btn.dataset.range === 'week') range = getWeekRange();
+    if (btn.dataset.range === 'month') range = getMonthRange();
+    if (btn.dataset.range === 'year') range = getYearRange();
+
+    setRandomQuote();
+    fetchData(range);
+  });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  setRandomQuote();
+  updateClock();
+  setInterval(updateClock, 30 * 1000);
+
+  // Default to Week
+  const weekBtn = document.querySelector('.range-btn[data-range="week"]');
+  if (weekBtn) weekBtn.click();
+});
+
   </script>
 </body>
 </html>
