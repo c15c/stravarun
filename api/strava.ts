@@ -39,30 +39,45 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     let startDate: Date;
     let endDate: Date;
-
+    
     if (start && end) {
-      // Use explicit range from query
-      startDate = new Date(start);
-      endDate = new Date(end);
+      // Parse as local dates, not UTC
+      const startParts = start.split('-');
+      const endParts = end.split('-');
+      
+      startDate = new Date(
+        parseInt(startParts[0]),
+        parseInt(startParts[1]) - 1,
+        parseInt(startParts[2]),
+        0, 0, 0, 0
+      );
+      
+      endDate = new Date(
+        parseInt(endParts[0]),
+        parseInt(endParts[1]) - 1,
+        parseInt(endParts[2]),
+        23, 59, 59, 999
+      );
     } else {
       // Default: this week, starting Monday (local time)
       const nowLocal = new Date();
-      endDate = nowLocal;
-
-      const day = nowLocal.getDay(); // 0 = Sunday, 1 = Monday, ... 6 = Saturday
-      const diffToMonday = (day + 6) % 7; // 0 if Monday, 1 if Tuesday, ... 6 if Sunday
-
+      const day = nowLocal.getDay();
+      const diffToMonday = day === 0 ? 6 : day - 1;
+    
       startDate = new Date(
         nowLocal.getFullYear(),
         nowLocal.getMonth(),
         nowLocal.getDate() - diffToMonday,
-        0,
-        0,
-        0,
-        0
+        0, 0, 0, 0
+      );
+      
+      endDate = new Date(
+        nowLocal.getFullYear(),
+        nowLocal.getMonth(),
+        nowLocal.getDate(),
+        23, 59, 59, 999
       );
     }
-
     const startIso = startDate.toISOString();
     const endIso = endDate.toISOString();
 
