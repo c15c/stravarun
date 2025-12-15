@@ -58,23 +58,35 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         parseInt(endParts[2]),
         23, 59, 59, 999
       );
-    } else {
-      // Default: this week, starting Monday (local time)
+      } else {
+      // Default: this week Monday-Sunday (local time)
       const nowLocal = new Date();
-      const day = nowLocal.getDay();
-      const diffToMonday = day === 0 ? 6 : day - 1;
-    
+      
+      const day = nowLocal.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+      
+      // Calculate days back to Monday
+      let daysBackToMonday;
+      if (day === 0) {
+        // Sunday - go back 6 days to get to Monday
+        daysBackToMonday = 6;
+      } else {
+        // Mon-Sat - go back (day - 1) days
+        daysBackToMonday = day - 1;
+      }
+      
       startDate = new Date(
         nowLocal.getFullYear(),
         nowLocal.getMonth(),
-        nowLocal.getDate() - diffToMonday,
+        nowLocal.getDate() - daysBackToMonday,
         0, 0, 0, 0
       );
       
+      // End date is this coming Sunday
+      const daysToSunday = 7 - day;
       endDate = new Date(
         nowLocal.getFullYear(),
         nowLocal.getMonth(),
-        nowLocal.getDate(),
+        nowLocal.getDate() + (day === 0 ? 0 : daysToSunday),
         23, 59, 59, 999
       );
     }
