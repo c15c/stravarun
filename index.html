@@ -406,21 +406,32 @@
     }
 
 
-    function updateRangeLabel(range) {
-      const label = document.getElementById('range-label');
-      if (!label || !range) return;
-      const start = new Date(range.start);
-      const end = new Date(range.end);
-      label.textContent =
-        `Showing runs from ${start.toLocaleDateString()} to ${end.toLocaleDateString()}`;
-    }
+ function formatDateOnly(iso) {
+  const [y, m, d] = iso.slice(0, 10).split('-');
+  return new Date(y, m - 1, d).toLocaleDateString();
+}
+
+function updateRangeLabel(range) {
+  const label = document.getElementById('range-label');
+  if (!label || !range) return;
+
+  label.textContent =
+    `Showing runs from ${formatDateOnly(range.start)} to ${formatDateOnly(range.end)}`;
+}
+
 
     async function fetchData(range) {
   const params = new URLSearchParams();
 
   if (range?.start && range?.end) {
-    params.append('start', range.start.toISOString().slice(0, 10));
-    params.append('end', range.end.toISOString().slice(0, 10));
+      params.append(
+        'start',
+        range.start.toISOString().slice(0, 10)
+      );
+      params.append(
+        'end',
+        range.end.toISOString().slice(0, 10)
+      );
   }
 
   const url = params.toString() ? `/api/strava?${params}` : '/api/strava';
@@ -471,24 +482,33 @@
       }
     }
 
-    function getWeekRange() {
+function toDateOnly(d) {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+function getWeekRange() {
   const now = new Date();
   const day = now.getDay(); // 0=Sun
   const diffToMonday = (day + 6) % 7;
 
-  const start = new Date(
+  const monday = new Date(
     now.getFullYear(),
     now.getMonth(),
-    now.getDate() - diffToMonday,
-    0, 0, 0, 0
+    now.getDate() - diffToMonday
   );
 
-  const end = new Date(
-    start.getFullYear(),
-    start.getMonth(),
-    start.getDate() + 6,
-    23, 59, 59, 999
+  const sunday = new Date(
+    monday.getFullYear(),
+    monday.getMonth(),
+    monday.getDate() + 6
   );
+
+  return {
+    start: toDateOnly(monday),
+    end: toDateOnly(sunday)
+  };
+}
+
 
   return { start, end };
 }
@@ -496,18 +516,19 @@
 function getMonthRange() {
   const now = new Date();
   return {
-    start: new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0),
-    end: new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999)
+    start: new Date(now.getFullYear(), now.getMonth(), 1),
+    end: new Date(now.getFullYear(), now.getMonth() + 1, 0)
   };
 }
 
 function getYearRange() {
   const now = new Date();
   return {
-    start: new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0),
-    end: new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999)
+    start: new Date(now.getFullYear(), 0, 1),
+    end: new Date(now.getFullYear(), 11, 31)
   };
 }
+
     document.querySelectorAll('.range-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document
