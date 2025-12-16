@@ -346,6 +346,10 @@
   </div>
 
   <script>
+    function formatNumber(num) {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
     const runningQuotes = [
       "A run isn't bad, it's just a bit sub-mediocre",
       "Celebrate!",
@@ -376,7 +380,7 @@
     ];
 
     // --- Counter Animation ---
-    function animateCounters() {
+        function animateCounters() {
       const counters = document.querySelectorAll('.counter');
       counters.forEach(counter => {
         const target = +counter.getAttribute('data-target');
@@ -385,27 +389,28 @@
         const frameDuration = 1000 / 60;
         const totalFrames = Math.round(duration / frameDuration);
         let frame = 0;
-
+    
         const easeOutQuad = t => t * (2 - t);
-
+    
         const timer = setInterval(() => {
           frame++;
           const progress = easeOutQuad(frame / totalFrames);
           const current = target * progress;
-
+    
           if (isInt) {
-            counter.textContent = Math.floor(current);
+            counter.textContent = formatNumber(Math.floor(current));
           } else {
             counter.textContent = current.toFixed(1);
           }
-
+    
           if (frame === totalFrames) {
             clearInterval(timer);
-            counter.textContent = isInt ? target : target.toFixed(1);
+            counter.textContent = isInt ? formatNumber(target) : target.toFixed(1);
           }
         }, frameDuration);
       });
     }
+
 
     // --- Clock & Week Ring ---
     function updateClock() {
