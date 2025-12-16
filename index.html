@@ -20,14 +20,14 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-      background: radial-gradient(circle at top left, #262a3d, #050609 55%);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      padding: 20px 24px; /* Reduced from 40px 32px */
-      animation: bgShift 60s infinite alternate;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    background: radial-gradient(circle at top left, #262a3d, #050609 55%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 16px 20px; /* Reduced from 20px 24px */
+    animation: bgShift 60s infinite alternate;
     }
 
     @keyframes bgShift {
@@ -36,17 +36,22 @@
     }
 
     .dashboard {
-      max-width: 1200px;
-      width: 100%;
+    max-width: 100%; /* Changed from 1200px */
+    width: 100%;
     }
 
     header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px; /* Reduced from 24px */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px; /* Reduced from 16px */
     }
-    .title-group h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
+    .title-group h1 { 
+    font-size: 24px; /* Reduced from 28px */
+    font-weight: 800; 
+    letter-spacing: -0.5px; 
+    margin-bottom: 4px; 
+    }
     .status { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
     
     .status-dot {
@@ -74,10 +79,10 @@
     .clock-date { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
 
     .controls {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px; /* Reduced from 24px */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px; /* Reduced from 16px */
     }
     .date-range {
       display: flex; gap: 4px; background: #10121b; padding: 4px; border-radius: 99px;
@@ -96,22 +101,22 @@
     .range-label { font-size: 13px; color: var(--muted); font-style: italic; }
 
     .grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px; /* Reduced from 24px */
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px; /* Reduced from 16px */
     }
     
     .card {
-      background: var(--bg-card-gradient);
-      border-radius: var(--card-radius);
-      padding: 16px; /* Reduced from 24px */
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255,255,255,0.03);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      opacity: 0;
-      animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    background: var(--bg-card-gradient);
+    border-radius: 16px; /* Reduced from 20px */
+    padding: 16px; /* Reduced from 18px */
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255,255,255,0.03);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    opacity: 0;
+    animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
     .card:hover {
       transform: translateY(-4px);
@@ -143,13 +148,22 @@
       color: var(--muted); opacity: 0.5; width: 18px; height: 18px;
     }
     
-    .card-value {
-      font-size: 32px; /* Reduced from 38px */
+      .card-value {
+      font-size: 28px; /* Reduced from 32px */
       font-weight: 200;
-      letter-spacing: -1px; margin-bottom: 4px;
-      position: relative; z-index: 2;
-    }
-    .card-unit { font-size: 16px; font-weight: 400; color: var(--muted); margin-left: 2px; }
+      letter-spacing: -1px; 
+      margin-bottom: 4px;
+      position: relative; 
+      z-index: 2;
+      }
+      
+      .card-unit { 
+      font-size: 14px; /* Reduced from 16px */
+      font-weight: 400; 
+      color: var(--muted); 
+      margin-left: 2px; 
+      }
+
     .card-sub { font-size: 12px; color: var(--muted); position: relative; z-index: 2; }
 
     .sparkline-container {
