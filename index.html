@@ -545,8 +545,12 @@
         const avgPace = document.getElementById('avg-pace');
         if (avgPace) avgPace.innerHTML = `${s.avgPacePerKm || 'N/A'}<span class="card-unit">/km</span>`;
 
-        const allTimeKm = document.getElementById('all-time-km');
-        if (allTimeKm) allTimeKm.textContent = s.allTimeKm ? s.allTimeKm.toFixed(1) + ' km' : '0 km';
+       const allTimeKm = document.getElementById('all-time-km');
+        if (allTimeKm) {
+        const km = s.allTimeKm ? s.allTimeKm.toFixed(1) : '0';
+        allTimeKm.textContent = `${km} km`;
+        }
+
 
         // Find and display longest run name
         if (activities.length > 0) {
