@@ -26,7 +26,7 @@
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      padding: 40px 32px;
+      padding: 20px 24px; /* Reduced from 40px 32px */
       animation: bgShift 60s infinite alternate;
     }
 
@@ -44,7 +44,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
+      margin-bottom: 16px; /* Reduced from 24px */
     }
     .title-group h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
     .status { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
@@ -66,31 +66,18 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 120px; height: 120px;
-    }
-    .progress-ring { transform: rotate(-90deg); transform-origin: 50% 50%; }
-    .progress-ring__circle {
-      stroke: var(--accent);
-      stroke-width: 4;
-      fill: transparent;
-      stroke-dasharray: 330;
-      stroke-dashoffset: 330;
-      transition: stroke-dashoffset 1s ease-in-out;
-      opacity: 0.8;
     }
     .clock-content {
-      position: absolute;
       text-align: center;
     }
     .clock-time { font-size: 24px; font-weight: 700; line-height: 1; }
     .clock-date { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
 
-
     .controls {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
+      margin-bottom: 16px; /* Reduced from 24px */
     }
     .date-range {
       display: flex; gap: 4px; background: #10121b; padding: 4px; border-radius: 99px;
@@ -111,13 +98,13 @@
     .grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 24px;
+      gap: 16px; /* Reduced from 24px */
     }
-
+    
     .card {
       background: var(--bg-card-gradient);
       border-radius: var(--card-radius);
-      padding: 24px;
+      padding: 18px; /* Reduced from 24px */
       position: relative;
       overflow: hidden;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
@@ -157,7 +144,8 @@
     }
     
     .card-value {
-      font-size: 38px; font-weight: 200;
+      font-size: 32px; /* Reduced from 38px */
+      font-weight: 200;
       letter-spacing: -1px; margin-bottom: 4px;
       position: relative; z-index: 2;
     }
@@ -251,16 +239,13 @@
         </div>
       </div>
       
-     <div class="clock-container">
-      <svg class="progress-ring" width="120" height="120">
-        <circle class="progress-ring__circle" stroke="var(--bg-card)" stroke-width="4" fill="transparent" r="55" cx="60" cy="60" style="opacity:0.2" />
-        <circle id="week-ring" class="progress-ring__circle" r="55" cx="60" cy="60" />
-      </svg>
+      <div class="clock-container">
       <div class="clock-content">
         <div class="clock-time" id="clock-time">00:00</div>
         <div class="clock-date" id="clock-date">Loading</div>
       </div>
     </div>
+
     </header>
 
     <div class="controls">
@@ -420,31 +405,18 @@
 
     // --- Clock & Week Ring ---
     function updateClock() {
-      const now = new Date();
-      const timeEl = document.getElementById('clock-time');
-      const dateEl = document.getElementById('clock-date');
-      
-      const hours = now.getHours().toString().padStart(2, '0');
-      const mins = now.getMinutes().toString().padStart(2, '0');
-      timeEl.textContent = `${hours}:${mins}`;
-      
-      const options = { weekday: 'short', day: 'numeric', month: 'short' };
-      dateEl.textContent = now.toLocaleDateString(undefined, options);
+    const now = new Date();
+    const timeEl = document.getElementById('clock-time');
+    const dateEl = document.getElementById('clock-date');
+    
+    const hours = now.getHours().toString().padStart(2, '0');
+    const mins = now.getMinutes().toString().padStart(2, '0');
+    timeEl.textContent = `${hours}:${mins}`;
+    
+    const options = { weekday: 'short', day: 'numeric', month: 'short' };
+    dateEl.textContent = now.toLocaleDateString(undefined, options);
+  }
 
-      const dayIndex = (now.getDay() + 6) % 7;
-      const totalMinutesInWeek = 7 * 24 * 60;
-      const currentMinutes = (dayIndex * 24 * 60) + (now.getHours() * 60) + now.getMinutes();
-      const percentage = currentMinutes / totalMinutesInWeek;
-      
-      const circle = document.getElementById('week-ring');
-      if (circle) {
-        const radius = circle.r.baseVal.value;
-        const circumference = 2 * Math.PI * 55; // Changed from 35 to 55
-        const offset = circumference - (percentage * circumference);
-        circle.style.strokeDasharray = `${circumference} ${circumference}`;
-        circle.style.strokeDashoffset = offset;
-      }
-    }
 
     // --- API Integration ---
     function formatDateOnly(iso) {
@@ -657,8 +629,8 @@
       setInterval(updateClock, 60000);
       setRandomQuote();
       
-      const weekBtn = document.querySelector('.range-btn[data-range="week"]');
-      if (weekBtn) weekBtn.click();
+      const monthBtn = document.querySelector('.range-btn[data-range="month"]');
+      if (monthBtn) monthBtn.click();
     });
   </script>
 </body>
