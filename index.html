@@ -2,432 +2,535 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Running Dashboard</title>
+  <title>Running Dashboard - Enhanced</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
       --bg: #050609;
       --bg-card: #151822;
+      --bg-card-gradient: linear-gradient(180deg, #1A1D29 0%, #151822 100%);
       --accent: #f5c84c;
+      --accent-glow: rgba(245, 200, 76, 0.4);
       --text: #f6f7fb;
       --muted: #8a8fa3;
+      --success: #3bd675;
       --error: #ff6666;
+      --card-radius: 20px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-        sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
       background: radial-gradient(circle at top left, #262a3d, #050609 55%);
       color: var(--text);
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      padding: 40px 32px 32px;
+      padding: 40px 32px;
+      animation: bgShift 60s infinite alternate;
     }
+
+    @keyframes bgShift {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+
     .dashboard {
       max-width: 1200px;
       width: 100%;
     }
+
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 24px;
     }
-    .title {
-      font-size: 24px;
-      font-weight: 700;
-    }
-    .status {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      color: var(--muted);
-    }
+    .title-group h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
+    .status { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+    
     .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: #3bd675;
+      width: 8px; height: 8px; border-radius: 50%; background: var(--success);
+      box-shadow: 0 0 0 0 rgba(59, 214, 117, 0.7);
+      animation: pulse-green 2s infinite;
     }
-    .clock {
-      font-size: 20px;
-      font-weight: 600;
-      text-align: right;
-    }
-    .clock small {
-      display: block;
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 400;
+    
+    @keyframes pulse-green {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59, 214, 117, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(59, 214, 117, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59, 214, 117, 0); }
     }
 
+    .clock-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 80px; height: 80px;
+    }
+    .progress-ring { transform: rotate(-90deg); transform-origin: 50% 50%; }
+    .progress-ring__circle {
+      stroke: var(--accent);
+      stroke-width: 4;
+      fill: transparent;
+      stroke-dasharray: 220;
+      stroke-dashoffset: 220;
+      transition: stroke-dashoffset 1s ease-in-out;
+      opacity: 0.8;
+    }
+    .clock-content {
+      position: absolute;
+      text-align: center;
+    }
+    .clock-time { font-size: 18px; font-weight: 700; line-height: 1; }
+    .clock-date { font-size: 10px; color: var(--muted); text-transform: uppercase; margin-top: 2px; }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
     .date-range {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 16px;
-      font-size: 13px;
-      color: var(--muted);
-    }
-    .date-range label {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .date-range input[type="date"] {
-      background: #10121b;
+      display: flex; gap: 4px; background: #10121b; padding: 4px; border-radius: 99px;
       border: 1px solid #26293a;
-      color: var(--text);
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 13px;
     }
-    .date-range button {
-      background: var(--accent);
-      color: #11121a;
-      border: none;
-      border-radius: 999px;
-      padding: 6px 14px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
+    .range-btn {
+      background: transparent; border: none; color: var(--muted);
+      padding: 8px 20px; border-radius: 99px; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 0.3s ease;
     }
+    .range-btn:hover { color: var(--text); }
+    .range-btn.active {
+      background: var(--bg-card); color: var(--accent);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3), 0 0 8px var(--accent-glow);
+    }
+    .range-label { font-size: 13px; color: var(--muted); font-style: italic; }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
     }
+
     .card {
-      background: var(--bg-card);
-      border-radius: 16px;
-      padding: 18px 20px;
-      min-height: 120px;
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+      background: var(--bg-card-gradient);
+      border-radius: var(--card-radius);
+      padding: 24px;
       position: relative;
       overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255,255,255,0.03);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      opacity: 0;
+      animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      border-color: rgba(255,255,255,0.08);
+    }
+
+    .card:nth-child(1) { animation-delay: 0.1s; }
+    .card:nth-child(2) { animation-delay: 0.15s; }
+    .card:nth-child(3) { animation-delay: 0.2s; }
+    .card:nth-child(4) { animation-delay: 0.25s; }
+    .card:nth-child(5) { animation-delay: 0.3s; }
+    .card:nth-child(6) { animation-delay: 0.35s; }
+    .card:nth-child(7) { animation-delay: 0.4s; }
+
+    @keyframes slideUpFade {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-header {
+      display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;
     }
     .card-title {
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-      margin-bottom: 12px;
+      font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--muted); font-weight: 700;
     }
-    .card-main {
-      font-size: 32px;
-      font-weight: 700;
+    .card-icon {
+      color: var(--muted); opacity: 0.5; width: 18px; height: 18px;
     }
-    .card-main span.small {
-      font-size: 18px;
-      font-weight: 500;
-      color: var(--muted);
-      margin-left: 4px;
+    
+    .card-value {
+      font-size: 38px; font-weight: 200;
+      letter-spacing: -1px; margin-bottom: 4px;
+      position: relative; z-index: 2;
     }
-    .card-sub {
-      margin-top: 6px;
-      font-size: 12px;
-      color: var(--muted);
+    .card-unit { font-size: 16px; font-weight: 400; color: var(--muted); margin-left: 2px; }
+    .card-sub { font-size: 12px; color: var(--muted); position: relative; z-index: 2; }
+
+    .sparkline-container {
+      position: absolute; bottom: 0; left: 0; width: 100%; height: 60px;
+      z-index: 1; opacity: 0.3; pointer-events: none;
     }
-    .card-highlight {
-      border: 1px solid rgba(245, 200, 76, 0.45);
+    .sparkline-path {
+      fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round;
+    }
+    .sparkline-fill {
+      fill: url(#gradientAccent); stroke: none;
     }
 
-    .error-text {
-      color: var(--error);
-      font-size: 12px;
-      margin-top: 8px;
+    .progress-container {
+      width: 100%; background: rgba(255,255,255,0.05); height: 4px;
+      border-radius: 4px; margin-top: 12px; overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%; background: var(--accent); width: 0%;
+      border-radius: 4px; transition: width 1s ease-out;
     }
 
-    /* Quote card layout */
-    .card-quote {
-      grid-column: span 2;
+    .span-2 { grid-column: span 2; }
+    .span-4 { grid-column: span 4; }
+
+    .activity-list { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+    .activity-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px;
+      transition: background 0.2s;
     }
-    .quote-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+    .activity-item:hover { background: rgba(255,255,255,0.06); }
+    .act-date { font-size: 12px; color: var(--muted); width: 60px; }
+    .act-details { flex: 1; font-size: 14px; font-weight: 600; }
+    .act-metric { font-size: 13px; color: var(--accent); font-feature-settings: "tnum"; }
+
+    .quote-card {
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
     }
-    .quote-text {
-      flex: 1 1 auto;
-    }
-    .quote-image {
-      flex: 0 0 auto;
-      max-height: 72px;
-      max-width: 72px;
-      height: auto;
-      width: auto;
-      object-fit: contain;
-      border-radius: 50%;
-      transform-origin: 50% 90%;    /* pivot near the chin */
-      animation: headshake 1.6s ease-in-out infinite;
+    .quote-content { flex: 1; }
+    .quote-text { font-size: 20px; font-weight: 600; line-height: 1.4; font-style: italic; }
+    .quote-author { font-size: 12px; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+    .bennett-head {
+      width: 64px; height: 64px; border-radius: 50%; object-fit: contain;
+      animation: headshake 2s ease-in-out infinite; cursor: pointer;
+      border: 2px solid rgba(255,255,255,0.1);
     }
 
-    .card-quote .card-main {
-      font-size: 24px;
-      line-height: 1.3;
+    svg { overflow: visible; }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .span-2 { grid-column: span 2; }
+      .span-4 { grid-column: span 2; }
+    }
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: 1fr; }
+      .span-2, .span-4 { grid-column: span 1; }
+      .controls { flex-direction: column; gap: 12px; align-items: flex-start; }
+      .activity-item { font-size: 12px; }
     }
 
     @keyframes headshake {
-      0%   { transform: rotate(0deg); }
-      20%  { transform: rotate(-6deg); }
-      40%  { transform: rotate(6deg); }
-      60%  { transform: rotate(-4deg); }
-      80%  { transform: rotate(4deg); }
-      100% { transform: rotate(0deg); }
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-5deg); }
+      75% { transform: rotate(5deg); }
     }
-
-    @media (max-width: 900px) {
-      .grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-    @media (max-width: 600px) {
-      body { padding: 12px; }
-      .grid {
-        grid-template-columns: 1fr;
-      }
-      .card-quote {
-        grid-column: span 1;
-      }
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-      }
-      .clock {
-        text-align: left;
-      }
-    }
-
-    .range-btn {
-  background: #10121b;
-  border: 1px solid #26293a;
-  color: var(--text);
-  padding: 6px 14px;
-  border-radius: 999px;
-  font-size: 13px;
-  cursor: pointer;
-}
-.range-btn.active {
-  background: var(--accent);
-  color: #11121a;
-  border-color: transparent;
-}
-
   </style>
 </head>
 <body>
+
+  <svg style="position: absolute; width: 0; height: 0;">
+    <defs>
+      <linearGradient id="gradientAccent" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.2"/>
+        <stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+  </svg>
+
   <div class="dashboard">
     <header>
-      <div>
-        <div class="title">Running Dashboard</div>
+      <div class="title-group">
+        <h1>Running Dashboard</h1>
         <div class="status">
           <span class="status-dot"></span>
-          <span id="connection-status">Connected</span>
-        </div>
-      </div>
-      <div class="clock">
-        <span id="clock-time">00:00</span>
-        <small id="clock-date">Loading…</small>
-      </div>
-    </header>
-
-  <!-- Date buttons -->
-  <div class="date-range">
-    <strong>Range:</strong>
-      <button class="range-btn" data-range="week">Week</button>
-      <button class="range-btn" data-range="month">Month</button>
-      <button class="range-btn" data-range="year">Year</button>
-      <span id="range-label"></span>
-    </div>
-
-    <div id="error-message" class="error-text" style="display:none;"></div>
-
-    <div class="grid">
-      <!-- Selected range: distance + runs -->
-      <div class="card">
-        <div class="card-title">This Range</div>
-        <div class="card-main">
-          <span id="range-km">0.0</span>
-          <span class="small">km</span>
-        </div>
-        <div class="card-sub">
-          <span id="range-runs">0</span> runs in range
+          <span>Connected</span>
         </div>
       </div>
       
+      <div class="clock-container">
+        <svg class="progress-ring" width="80" height="80">
+          <circle class="progress-ring__circle" stroke="var(--bg-card)" stroke-width="4" fill="transparent" r="35" cx="40" cy="40" style="opacity:0.2" />
+          <circle id="week-ring" class="progress-ring__circle" r="35" cx="40" cy="40" />
+        </svg>
+        <div class="clock-content">
+          <div class="clock-time" id="clock-time">00:00</div>
+          <div class="clock-date" id="clock-date">Loading</div>
+        </div>
+      </div>
+    </header>
 
+    <div class="controls">
+      <div class="date-range">
+        <button class="range-btn active" data-range="week">Week</button>
+        <button class="range-btn" data-range="month">Month</button>
+        <button class="range-btn" data-range="year">Year</button>
+      </div>
+      <span class="range-label" id="range-label">Showing runs from 15 Dec to 21 Dec</span>
+    </div>
 
+    <div class="grid">
+      
+      <div class="card span-2">
+        <div class="card-header">
+          <div class="card-title">Distance</div>
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div class="card-value"><span class="counter" id="distance-counter" data-target="73.0">0</span><span class="card-unit">km</span></div>
+        <div class="card-sub" id="runs-in-range">7 runs in this range</div>
+        
+        <div class="sparkline-container">
+          <svg width="100%" height="100%" preserveAspectRatio="none">
+            <path class="sparkline-fill" d="M0,60 L0,40 L50,20 L100,50 L150,10 L200,30 L250,5 L300,60 Z" />
+            <path class="sparkline-path" d="M0,40 L50,20 L100,50 L150,10 L200,30 L250,5" />
+          </svg>
+        </div>
+      </div>
 
-      <!-- Average pace -->
       <div class="card">
-        <div class="card-title">Avg Pace</div>
-        <div class="card-main">
-          <span id="avg-pace">0:00</span>
-          <span class="small">per kilometer</span>
+        <div class="card-header">
+          <div class="card-title">Avg Pace</div>
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         </div>
-        <div class="card-sub">
-          Average pace for range
-        </div>
+        <div class="card-value" id="avg-pace" style="color:var(--success)">5:59<span class="card-unit">/km</span></div>
+        <div class="card-sub">Consistent effort</div>
       </div>
 
-      <!-- Longest run -->
       <div class="card">
-        <div class="card-title">Longest Run</div>
-        <div class="card-main">
-          <span id="longest-run">0.0</span>
-          <span class="small">kilometers</span>
+        <div class="card-header">
+          <div class="card-title">Longest Run</div>
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         </div>
-        <div class="card-sub">
-          Longest single run in range
-        </div>
+        <div class="card-value"><span class="counter" id="longest-counter" data-target="17.0">0</span><span class="card-unit">km</span></div>
+        <div class="card-sub">Sunday Long Run</div>
       </div>
 
-      <!-- Calories -->
-      <div class="card card-highlight">
-        <div class="card-title">Calories Burned</div>
-        <div class="card-main">
-          <span id="calories">0</span>
+      <div class="card span-2">
+        <div class="card-header">
+          <div class="card-title">This Month</div>
+          <div class="card-title">Goal: 100km</div>
         </div>
-        <div class="card-sub">
-          Estimated calories from runs
+        <div class="card-value"><span class="counter" id="month-counter" data-target="67.9">0</span><span class="card-unit">km</span></div>
+        <div class="progress-container">
+          <div class="progress-bar" style="width: 68%"></div>
         </div>
+        <div class="card-sub" style="margin-top:8px">68% of monthly goal completed</div>
       </div>
 
-      <!-- This Month (month-to-date from API) -->
-      <div class="card card-highlight">
-        <div class="card-title">This Month</div>
-        <div class="card-main">
-          <span id="month-km">0.0</span>
-          <span class="small">kilometers</span>
-        </div>
-        <div class="card-sub">
-          Total run distance this month
-        </div>
-      </div>
-
-      <!-- All-time runs -->
-      <div class="card card-highlight">
-        <div class="card-title">Total Runs</div>
-        <div class="card-main">
-          <span id="all-runs">0</span>
-        </div>
-        <div class="card-sub">
-          All-time runs
-        </div>
-      </div>
-
-      <!-- All-time distance -->
       <div class="card">
-        <div class="card-title">All-Time Distance</div>
-        <div class="card-main">
-          <span id="all-km">0.0</span>
-          <span class="small">kilometers</span>
+        <div class="card-header">
+          <div class="card-title">Calories</div>
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-2.072-4.143-3-6 1.95 3.142 5.95 3.142 7.95 0A2.5 2.5 0 0 0 14.5 9a2.5 2.5 0 0 0 0 4h-6Z"/></svg>
         </div>
-        <div class="card-sub">
-          Sum of all runs
-        </div>
+        <div class="card-value"><span class="counter" id="calories-counter" data-target="5837" data-int="true">0</span></div>
+        <div class="card-sub">Est. burn</div>
       </div>
 
-      <!-- Quote card -->
-      <div class="card card-quote">
-        <div class="quote-inner">
-          <div class="quote-text">
-            <div class="card-title">Coach Bennett</div>
-            <div class="card-main" id="quote-text">
-              Every run has a purpose.
-            </div>
-            <div class="card-sub" id="quote-sub"></div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Total Runs</div>
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="card-value"><span class="counter" id="runs-counter" data-target="48" data-int="true">0</span></div>
+        <div class="card-sub">All-time: <span id="all-time-km">428.6 km</span></div>
+      </div>
+
+      <div class="card span-2">
+        <div class="card-header">
+          <div class="card-title">Recent Activity</div>
+        </div>
+        <div class="activity-list">
+          <div class="activity-item">
+            <span class="act-date">Today</span>
+            <span class="act-details">Morning Recovery Jog</span>
+            <span class="act-metric">5.2 km</span>
           </div>
-          <img
-            class="quote-image"
-            src="https://raw.githubusercontent.com/c15c/stravarun/refs/heads/main/bennett_head.png"
-            alt="Coach Bennett"
-          />
+          <div class="activity-item">
+            <span class="act-date">Sun</span>
+            <span class="act-details">Long Run</span>
+            <span class="act-metric">17.0 km</span>
+          </div>
+          <div class="activity-item">
+            <span class="act-date">Fri</span>
+            <span class="act-details">Tempo Intervals</span>
+            <span class="act-metric">10.5 km</span>
+          </div>
         </div>
       </div>
+
+      <div class="card quote-card span-2">
+        <div class="quote-content">
+          <div class="quote-author">Coach Bennett</div>
+          <div class="quote-text" id="quote-text">
+            "The end of one finish line is the beginning of a new starting line."
+          </div>
+        </div>
+        <img class="bennett-head" src="https://raw.githubusercontent.com/c15c/stravarun/refs/heads/main/bennetthead.png" alt="Coach Bennett" />
+      </div>
+
     </div>
   </div>
 
   <script>
     const runningQuotes = [
-    "A run isn't bad, it's just a bit sub-mediocre",
-    "Celebrate!",
-    "Count your victories in as many ways as you can",
-    "Easy runs should feel easy",
-    "Every finish line is a starting line in disguise",
-    "Every run has a purpose.",
-    "Fill your life with great verbs. That will surround you with the right nouns and you will live a life that merits the best adjectives.",
-    "If it's not easy, that doesn't mean it's too hard",
-    "If you aren't running, you are recovering",
-    "I'm talking about running. I'm also not talking about running.",
-    "If you can't do the run you want, do the run you can.",
-    "Maybe you can't means maybe you can",
-    "Play at running.",
-    "Release the Kraken!",
-    "Run smart",
-    "Running isn't boring, but some runners are.",
-    "Something is better than nothing, cause those small bits of somethingness fill up the nothingness, and soon enough you'll have a lot of somethings",
-    "Struggling does not mean failure. Struggling means successfully not giving up",
-    "The end of one finish line is the beginning of a new starting line",
-    "There are no guarantees when you cross the starting line",
-    "This is about running, and it's also not about running",
-    "We do hard things not so they become easy, but so we can take on even harder things",
-    "We don't race to prove we're runners, we race to celebrate being runners.",
-    "You are a bad-ass!",
-    "You can get better at running, while not running",
-    "You don't have to run every day to be a runner every day"
+      "A run isn't bad, it's just a bit sub-mediocre",
+      "Celebrate!",
+      "Count your victories in as many ways as you can",
+      "Easy runs should feel easy",
+      "Every finish line is a starting line in disguise",
+      "Every run has a purpose.",
+      "Fill your life with great verbs. That will surround you with the right nouns and you will live a life that merits the best adjectives.",
+      "If it's not easy, that doesn't mean it's too hard",
+      "If you aren't running, you are recovering",
+      "I'm talking about running. I'm also not talking about running.",
+      "If you can't do the run you want, do the run you can.",
+      "Maybe you can't means maybe you can",
+      "Play at running.",
+      "Release the Kraken!",
+      "Run smart",
+      "Running isn't boring, but some runners are.",
+      "Something is better than nothing, cause those small bits of somethingness fill up the nothingness, and soon enough you'll have a lot of somethings",
+      "Struggling does not mean failure. Struggling means successfully not giving up",
+      "The end of one finish line is the beginning of a new starting line",
+      "There are no guarantees when you cross the starting line",
+      "This is about running, and it's also not about running",
+      "We do hard things not so they become easy, but so we can take on even harder things",
+      "We don't race to prove we're runners, we race to celebrate being runners.",
+      "You are a bad-ass!",
+      "You can get better at running, while not running",
+      "You don't have to run every day to be a runner every day"
     ];
 
-    function setRandomQuote() {
-      const quoteEl = document.getElementById('quote-text');
-      if (!quoteEl || runningQuotes.length === 0) return;
-      const idx = Math.floor(Math.random() * runningQuotes.length);
-      quoteEl.textContent = runningQuotes[idx];
+    // --- Counter Animation ---
+    function animateCounters() {
+      const counters = document.querySelectorAll('.counter');
+      counters.forEach(counter => {
+        const target = +counter.getAttribute('data-target');
+        const isInt = counter.getAttribute('data-int') === 'true';
+        const duration = 1500;
+        const frameDuration = 1000 / 60;
+        const totalFrames = Math.round(duration / frameDuration);
+        let frame = 0;
+
+        const easeOutQuad = t => t * (2 - t);
+
+        const timer = setInterval(() => {
+          frame++;
+          const progress = easeOutQuad(frame / totalFrames);
+          const current = target * progress;
+
+          if (isInt) {
+            counter.textContent = Math.floor(current);
+          } else {
+            counter.textContent = current.toFixed(1);
+          }
+
+          if (frame === totalFrames) {
+            clearInterval(timer);
+            counter.textContent = isInt ? target : target.toFixed(1);
+          }
+        }, frameDuration);
+      });
     }
 
+    // --- Clock & Week Ring ---
     function updateClock() {
       const now = new Date();
       const timeEl = document.getElementById('clock-time');
       const dateEl = document.getElementById('clock-date');
-      if (!timeEl || !dateEl) return;
-
+      
       const hours = now.getHours().toString().padStart(2, '0');
       const mins = now.getMinutes().toString().padStart(2, '0');
       timeEl.textContent = `${hours}:${mins}`;
-
-      const options = { weekday: 'long', day: 'numeric', month: 'short' };
+      
+      const options = { weekday: 'short', day: 'numeric', month: 'short' };
       dateEl.textContent = now.toLocaleDateString(undefined, options);
+
+      const dayIndex = (now.getDay() + 6) % 7;
+      const totalMinutesInWeek = 7 * 24 * 60;
+      const currentMinutes = (dayIndex * 24 * 60) + (now.getHours() * 60) + now.getMinutes();
+      const percentage = currentMinutes / totalMinutesInWeek;
+      
+      const circle = document.getElementById('week-ring');
+      if (circle) {
+        const radius = circle.r.baseVal.value;
+        const circumference = 2 * Math.PI * radius;
+        const offset = circumference - (percentage * circumference);
+        circle.style.strokeDasharray = `${circumference} ${circumference}`;
+        circle.style.strokeDashoffset = offset;
+      }
     }
 
-      function formatDateOnly(iso) {
+    // --- API Integration ---
+    function formatDateOnly(iso) {
       const [y, m, d] = iso.slice(0, 10).split('-');
-      return new Date(y, m - 1, d).toLocaleDateString();
+      return new Date(y, m - 1, d).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
     }
     
-      function updateRangeLabel(range) {
+    function updateRangeLabel(range) {
       const label = document.getElementById('range-label');
       if (!label || !range) return;
-    
-      label.textContent =
-        `Showing runs from ${formatDateOnly(range.start)} to ${formatDateOnly(range.end)}`;
+      label.textContent = `Showing runs from ${formatDateOnly(range.start)} to ${formatDateOnly(range.end)}`;
     }
 
+    function formatDateForAPI(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function toDateOnly(d) {
+      return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    }
+
+    function getWeekRange() {
+      const now = new Date();
+      const day = now.getDay();
+      const diffToMonday = (day === 0 ? 6 : day - 1);
+
+      const monday = new Date(now);
+      monday.setDate(now.getDate() - diffToMonday);
+      monday.setHours(0, 0, 0, 0);
+
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      sunday.setHours(23, 59, 59, 999);
+
+      return {
+        start: toDateOnly(monday),
+        end: toDateOnly(sunday)
+      };
+    }
+
+    function getMonthRange() {
+      const now = new Date();
+      return {
+        start: new Date(now.getFullYear(), now.getMonth(), 1),
+        end: new Date(now.getFullYear(), now.getMonth() + 1, 0)
+      };
+    }
+
+    function getYearRange() {
+      const now = new Date();
+      return {
+        start: new Date(now.getFullYear(), 0, 1),
+        end: new Date(now.getFullYear(), 11, 31)
+      };
+    }
 
     async function fetchData(range) {
-  const params = new URLSearchParams();
+      const params = new URLSearchParams();
 
-  if (range?.start && range?.end) {
-      params.append('start', formatDateForAPI(range.start));
-      params.append('end', formatDateForAPI(range.end));
-  }
+      if (range?.start && range?.end) {
+        params.append('start', formatDateForAPI(range.start));
+        params.append('end', formatDateForAPI(range.end));
+      }
 
-  const url = params.toString() ? `/api/strava?${params}` : '/api/strava';
+      const url = params.toString() ? `/api/strava?${params}` : '/api/strava';
 
       try {
         const res = await fetch(url);
@@ -439,128 +542,96 @@
         updateRangeLabel(data.range);
 
         const s = data.summary || {};
-        const activities = data.activities || [];
+        
+        // Update counter targets
+        const distanceCounter = document.getElementById('distance-counter');
+        if (distanceCounter) distanceCounter.setAttribute('data-target', s.totalKm || 0);
+        
+        const longestCounter = document.getElementById('longest-counter');
+        if (longestCounter) longestCounter.setAttribute('data-target', s.longestRunKm || 0);
+        
+        const monthCounter = document.getElementById('month-counter');
+        if (monthCounter) monthCounter.setAttribute('data-target', s.monthKm || 0);
+        
+        const caloriesCounter = document.getElementById('calories-counter');
+        if (caloriesCounter) caloriesCounter.setAttribute('data-target', s.calories || 0);
+        
+        const runsCounter = document.getElementById('runs-counter');
+        if (runsCounter) runsCounter.setAttribute('data-target', s.allTimeRuns || 0);
 
-        document.getElementById('range-km').textContent =
-          s.totalKm != null ? s.totalKm.toFixed(1) : '0.0';
-        document.getElementById('range-runs').textContent =
-          s.totalRuns != null ? s.totalRuns : activities.length || 0;
-        document.getElementById('avg-pace').textContent =
-          s.avgPacePerKm || 'N/A';
-        document.getElementById('longest-run').textContent =
-          s.longestRunKm != null ? s.longestRunKm.toFixed(1) : '0.0';
-        document.getElementById('calories').textContent =
-          s.calories != null ? s.calories.toString() : '0';
+        // Update text fields
+        const runsInRange = document.getElementById('runs-in-range');
+        if (runsInRange) runsInRange.textContent = `${s.totalRuns || 0} runs in this range`;
 
-        document.getElementById('all-km').textContent =
-          s.allTimeKm != null ? s.allTimeKm.toFixed(1) : '0.0';
-        document.getElementById('all-runs').textContent =
-          s.allTimeRuns != null ? s.allTimeRuns.toString() : '0';
+        const avgPace = document.getElementById('avg-pace');
+        if (avgPace) avgPace.innerHTML = `${s.avgPacePerKm || 'N/A'}<span class="card-unit">/km</span>`;
 
-        const monthKmEl = document.getElementById('month-km');
-        if (monthKmEl) {
-          if (s.monthKm != null) {
-            monthKmEl.textContent = s.monthKm.toFixed(1);
-          } else {
-            monthKmEl.textContent = '0.0';
-          }
-        }
+        const allTimeKm = document.getElementById('all-time-km');
+        if (allTimeKm) allTimeKm.textContent = s.allTimeKm ? s.allTimeKm.toFixed(1) + ' km' : '0 km';
+
+        // Animate counters
+        animateCounters();
+
+        // Animate cards
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+          card.style.animation = 'none';
+          card.offsetHeight;
+          card.style.animation = 'slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+        });
+
       } catch (err) {
-        console.error(err);
-        if (errorEl) {
-          errorEl.textContent =
-            'Failed to load data from Strava. Please try again in a moment.';
-          errorEl.style.display = 'block';
-        }
+        console.error('API Error:', err);
       }
     }
 
-function toDateOnly(d) {
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
-}
+    // --- Random Quote ---
+    function setRandomQuote() {
+      const el = document.getElementById('quote-text');
+      if (!el) return;
+      el.style.opacity = 0;
+      setTimeout(() => {
+        const idx = Math.floor(Math.random() * runningQuotes.length);
+        el.textContent = `"${runningQuotes[idx]}"`;
+        el.style.opacity = 1;
+      }, 200);
+    }
 
-function getWeekRange() {
-  const now = new Date();
-  const day = now.getDay(); // 0=Sun, 1=Mon, etc
-  const diffToMonday = (day === 0 ? 6 : day - 1); // Simple: if Sunday, go back 6, else go back (day - 1)
-
-  const monday = new Date(now);
-  monday.setDate(now.getDate() - diffToMonday);
-  monday.setHours(0, 0, 0, 0);
-
-  const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 6);
-  sunday.setHours(23, 59, 59, 999);
-
-  return {
-    start: toDateOnly(monday),
-    end: toDateOnly(sunday)
-  };
-}
-
-
-function getMonthRange() {
-  const now = new Date();
-  return {
-    start: new Date(now.getFullYear(), now.getMonth(), 1),
-    end: new Date(now.getFullYear(), now.getMonth() + 1, 0)
-  };
-}
-
-function getYearRange() {
-  const now = new Date();
-  return {
-    start: new Date(now.getFullYear(), 0, 1),
-    end: new Date(now.getFullYear(), 11, 31)
-  };
-}
-
+    // --- Range Buttons ---
     document.querySelectorAll('.range-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document
-      .querySelectorAll('.range-btn')
-      .forEach(b => b.classList.remove('active'));
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        
+        let range;
+        if (btn.dataset.range === 'week') range = getWeekRange();
+        if (btn.dataset.range === 'month') range = getMonthRange();
+        if (btn.dataset.range === 'year') range = getYearRange();
 
-    btn.classList.add('active');
-
-    let range;
-    if (btn.dataset.range === 'week') range = getWeekRange();
-    if (btn.dataset.range === 'month') range = getMonthRange();
-    if (btn.dataset.range === 'year') range = getYearRange();
-
-    setRandomQuote();
-    fetchData(range);
-  });
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-  setRandomQuote();
-  updateClock();
-  setInterval(updateClock, 30 * 1000);
-
-  // Bennett head click = new quote + refetch current range
-  const bennettHead = document.querySelector('.quote-image');
-  if (bennettHead) {
-    bennettHead.addEventListener('click', () => {
-      setRandomQuote();
-
-      const activeBtn = document.querySelector('.range-btn.active');
-      if (activeBtn) activeBtn.click();
+        setRandomQuote();
+        fetchData(range);
+      });
     });
-  }
 
-  // Default to Week on load
-  const weekBtn = document.querySelector('.range-btn[data-range="week"]');
-  if (weekBtn) weekBtn.click();
-});
-function formatDateForAPI(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
+    // Bennett head click
+    const bennettHead = document.querySelector('.bennett-head');
+    if (bennettHead) {
+      bennettHead.addEventListener('click', () => {
+        setRandomQuote();
+        const activeBtn = document.querySelector('.range-btn.active');
+        if (activeBtn) activeBtn.click();
+      });
+    }
 
-
+    // --- Init ---
+    document.addEventListener('DOMContentLoaded', () => {
+      updateClock();
+      setInterval(updateClock, 60000);
+      setRandomQuote();
+      
+      const weekBtn = document.querySelector('.range-btn[data-range="week"]');
+      if (weekBtn) weekBtn.click();
+    });
   </script>
 </body>
 </html>
