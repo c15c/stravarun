@@ -66,15 +66,15 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 80px; height: 80px;
+      width: 120px; height: 120px;
     }
     .progress-ring { transform: rotate(-90deg); transform-origin: 50% 50%; }
     .progress-ring__circle {
       stroke: var(--accent);
       stroke-width: 4;
       fill: transparent;
-      stroke-dasharray: 220;
-      stroke-dashoffset: 220;
+      stroke-dasharray: 330;
+      stroke-dashoffset: 330;
       transition: stroke-dashoffset 1s ease-in-out;
       opacity: 0.8;
     }
@@ -82,8 +82,9 @@
       position: absolute;
       text-align: center;
     }
-    .clock-time { font-size: 18px; font-weight: 700; line-height: 1; }
-    .clock-date { font-size: 10px; color: var(--muted); text-transform: uppercase; margin-top: 2px; }
+    .clock-time { font-size: 24px; font-weight: 700; line-height: 1; }
+    .clock-date { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
+
 
     .controls {
       display: flex;
@@ -250,16 +251,16 @@
         </div>
       </div>
       
-      <div class="clock-container">
-        <svg class="progress-ring" width="80" height="80">
-          <circle class="progress-ring__circle" stroke="var(--bg-card)" stroke-width="4" fill="transparent" r="35" cx="40" cy="40" style="opacity:0.2" />
-          <circle id="week-ring" class="progress-ring__circle" r="35" cx="40" cy="40" />
-        </svg>
-        <div class="clock-content">
-          <div class="clock-time" id="clock-time">00:00</div>
-          <div class="clock-date" id="clock-date">Loading</div>
-        </div>
+     <div class="clock-container">
+      <svg class="progress-ring" width="120" height="120">
+        <circle class="progress-ring__circle" stroke="var(--bg-card)" stroke-width="4" fill="transparent" r="55" cx="60" cy="60" style="opacity:0.2" />
+        <circle id="week-ring" class="progress-ring__circle" r="55" cx="60" cy="60" />
+      </svg>
+      <div class="clock-content">
+        <div class="clock-time" id="clock-time">00:00</div>
+        <div class="clock-date" id="clock-date">Loading</div>
       </div>
+    </div>
     </header>
 
     <div class="controls">
@@ -438,7 +439,7 @@
       const circle = document.getElementById('week-ring');
       if (circle) {
         const radius = circle.r.baseVal.value;
-        const circumference = 2 * Math.PI * radius;
+        const circumference = 2 * Math.PI * 55; // Changed from 35 to 55
         const offset = circumference - (percentage * circumference);
         circle.style.strokeDasharray = `${circumference} ${circumference}`;
         circle.style.strokeDashoffset = offset;
