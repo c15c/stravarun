@@ -534,8 +534,20 @@
         const longestCounter = document.getElementById('longest-counter');
         if (longestCounter) longestCounter.setAttribute('data-target', s.longestRunKm || 0);
         
-        const monthCounter = document.getElementById('month-counter');
-        if (monthCounter) monthCounter.setAttribute('data-target', s.monthKm || 0);
+        // Update marathon progress based on longest run
+        const marathonDistance = 42.195;
+        const longestKm = s.longestRunKm || 0;
+        const marathonPercent = Math.min(100, (longestKm / marathonDistance) * 100);
+        
+        const marathonCounter = document.getElementById('marathon-counter');
+        if (marathonCounter) marathonCounter.setAttribute('data-target', longestKm);
+        
+        const marathonProgress = document.getElementById('marathon-progress');
+        if (marathonProgress) marathonProgress.style.width = `${marathonPercent.toFixed(0)}%`;
+        
+        const marathonPercentText = document.getElementById('marathon-percent');
+        if (marathonPercentText) marathonPercentText.textContent = `${marathonPercent.toFixed(0)}% of marathon distance`;
+
         
         const caloriesCounter = document.getElementById('calories-counter');
         if (caloriesCounter) caloriesCounter.setAttribute('data-target', s.calories || 0);
