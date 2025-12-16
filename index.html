@@ -206,7 +206,6 @@
     .bennett-head {
       width: 64px; height: 64px; border-radius: 50%; object-fit: contain;
       animation: headshake 2s ease-in-out infinite; cursor: pointer;
-      border: 2px solid rgba(255,255,255,0.1);
     }
 
     svg { overflow: visible; }
@@ -269,7 +268,7 @@
         <button class="range-btn" data-range="month">Month</button>
         <button class="range-btn" data-range="year">Year</button>
       </div>
-      <span class="range-label" id="range-label">Showing runs from 15 Dec to 21 Dec</span>
+      <span class="range-label" id="range-label">Showing runs from...</span>
     </div>
 
     <div class="grid">
@@ -279,8 +278,8 @@
           <div class="card-title">Distance</div>
           <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
         </div>
-        <div class="card-value"><span class="counter" id="distance-counter" data-target="73.0">0</span><span class="card-unit">km</span></div>
-        <div class="card-sub" id="runs-in-range">7 runs in this range</div>
+        <div class="card-value"><span class="counter" id="distance-counter" data-target="0">0</span><span class="card-unit">km</span></div>
+        <div class="card-sub" id="runs-in-range">0 runs in this range</div>
         
         <div class="sparkline-container">
           <svg width="100%" height="100%" preserveAspectRatio="none">
@@ -295,8 +294,8 @@
           <div class="card-title">Avg Pace</div>
           <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         </div>
-        <div class="card-value" id="avg-pace" style="color:var(--success)">5:59<span class="card-unit">/km</span></div>
-        <div class="card-sub">Consistent effort</div>
+        <div class="card-value" id="avg-pace" style="color:var(--success)">N/A<span class="card-unit">/km</span></div>
+        <div class="card-sub">Average pace</div>
       </div>
 
       <div class="card">
@@ -304,20 +303,16 @@
           <div class="card-title">Longest Run</div>
           <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         </div>
-        <div class="card-value"><span class="counter" id="longest-counter" data-target="17.0">0</span><span class="card-unit">km</span></div>
-        <div class="card-sub">Sunday Long Run</div>
+        <div class="card-value"><span class="counter" id="longest-counter" data-target="0">0</span><span class="card-unit">km</span></div>
+        <div class="card-sub" id="longest-run-name">Peak performance</div>
       </div>
 
       <div class="card span-2">
         <div class="card-header">
           <div class="card-title">This Month</div>
-          <div class="card-title">Goal: 100km</div>
         </div>
-        <div class="card-value"><span class="counter" id="month-counter" data-target="67.9">0</span><span class="card-unit">km</span></div>
-        <div class="progress-container">
-          <div class="progress-bar" style="width: 68%"></div>
-        </div>
-        <div class="card-sub" style="margin-top:8px">68% of monthly goal completed</div>
+        <div class="card-value"><span class="counter" id="month-counter" data-target="0">0</span><span class="card-unit">km</span></div>
+        <div class="card-sub" style="margin-top:8px">Month to date</div>
       </div>
 
       <div class="card">
@@ -325,7 +320,7 @@
           <div class="card-title">Calories</div>
           <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-2.072-4.143-3-6 1.95 3.142 5.95 3.142 7.95 0A2.5 2.5 0 0 0 14.5 9a2.5 2.5 0 0 0 0 4h-6Z"/></svg>
         </div>
-        <div class="card-value"><span class="counter" id="calories-counter" data-target="5837" data-int="true">0</span></div>
+        <div class="card-value"><span class="counter" id="calories-counter" data-target="0" data-int="true">0</span></div>
         <div class="card-sub">Est. burn</div>
       </div>
 
@@ -334,30 +329,16 @@
           <div class="card-title">Total Runs</div>
           <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         </div>
-        <div class="card-value"><span class="counter" id="runs-counter" data-target="48" data-int="true">0</span></div>
-        <div class="card-sub">All-time: <span id="all-time-km">428.6 km</span></div>
+        <div class="card-value"><span class="counter" id="runs-counter" data-target="0" data-int="true">0</span></div>
+        <div class="card-sub">All-time: <span id="all-time-km">0 km</span></div>
       </div>
 
       <div class="card span-2">
         <div class="card-header">
           <div class="card-title">Recent Activity</div>
         </div>
-        <div class="activity-list">
-          <div class="activity-item">
-            <span class="act-date">Today</span>
-            <span class="act-details">Morning Recovery Jog</span>
-            <span class="act-metric">5.2 km</span>
-          </div>
-          <div class="activity-item">
-            <span class="act-date">Sun</span>
-            <span class="act-details">Long Run</span>
-            <span class="act-metric">17.0 km</span>
-          </div>
-          <div class="activity-item">
-            <span class="act-date">Fri</span>
-            <span class="act-details">Tempo Intervals</span>
-            <span class="act-metric">10.5 km</span>
-          </div>
+        <div class="activity-list" id="activity-list">
+          <div class="card-sub" style="text-align: center; padding: 20px;">Loading activities...</div>
         </div>
       </div>
 
@@ -365,7 +346,7 @@
         <div class="quote-content">
           <div class="quote-author">Coach Bennett</div>
           <div class="quote-text" id="quote-text">
-            "The end of one finish line is the beginning of a new starting line."
+            "Loading..."
           </div>
         </div>
         <img class="bennett-head" src="https://raw.githubusercontent.com/c15c/stravarun/refs/heads/main/bennetthead.png" alt="Coach Bennett" />
@@ -469,6 +450,21 @@
       const [y, m, d] = iso.slice(0, 10).split('-');
       return new Date(y, m - 1, d).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
     }
+
+    function formatActivityDate(isoString) {
+      const date = new Date(isoString);
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const activityDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      
+      const diffTime = today - activityDate;
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === 0) return 'Today';
+      if (diffDays === 1) return 'Yesterday';
+      if (diffDays < 7) return date.toLocaleDateString('en-US', { weekday: 'short' });
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
     
     function updateRangeLabel(range) {
       const label = document.getElementById('range-label');
@@ -542,6 +538,7 @@
         updateRangeLabel(data.range);
 
         const s = data.summary || {};
+        const activities = data.activities || [];
         
         // Update counter targets
         const distanceCounter = document.getElementById('distance-counter');
@@ -568,6 +565,36 @@
 
         const allTimeKm = document.getElementById('all-time-km');
         if (allTimeKm) allTimeKm.textContent = s.allTimeKm ? s.allTimeKm.toFixed(1) + ' km' : '0 km';
+
+        // Find and display longest run name
+        if (activities.length > 0) {
+          const longestRun = activities.reduce((max, run) => 
+            run.distance > max.distance ? run : max
+          );
+          const longestRunName = document.getElementById('longest-run-name');
+          if (longestRunName) {
+            longestRunName.textContent = longestRun.name || 'Long run';
+          }
+        }
+
+        // Update Recent Activity with last 3 runs
+        const activityList = document.getElementById('activity-list');
+        if (activityList && activities.length > 0) {
+          const recentRuns = activities.slice(0, 3);
+          activityList.innerHTML = recentRuns.map(activity => {
+            const distance = (activity.distance / 1000).toFixed(1);
+            const dateLabel = formatActivityDate(activity.start_date_local);
+            return `
+              <div class="activity-item">
+                <span class="act-date">${dateLabel}</span>
+                <span class="act-details">${activity.name}</span>
+                <span class="act-metric">${distance} km</span>
+              </div>
+            `;
+          }).join('');
+        } else if (activityList) {
+          activityList.innerHTML = '<div class="card-sub" style="text-align: center; padding: 20px;">No recent activities</div>';
+        }
 
         // Animate counters
         animateCounters();
