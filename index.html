@@ -423,14 +423,8 @@
   const params = new URLSearchParams();
 
   if (range?.start && range?.end) {
-      params.append(
-        'start',
-        range.start.toISOString().slice(0, 10)
-      );
-      params.append(
-        'end',
-        range.end.toISOString().slice(0, 10)
-      );
+      params.append('start', formatDateForAPI(range.start));
+      params.append('end', formatDateForAPI(range.end));
   }
 
   const url = params.toString() ? `/api/strava?${params}` : '/api/strava';
@@ -559,6 +553,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const weekBtn = document.querySelector('.range-btn[data-range="week"]');
   if (weekBtn) weekBtn.click();
 });
+function formatDateForAPI(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
 
 
   </script>
